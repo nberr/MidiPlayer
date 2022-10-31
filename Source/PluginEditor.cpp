@@ -10,31 +10,36 @@
 #include "PluginEditor.h"
 
 //==============================================================================
-MidiPlayerAudioProcessorEditor::MidiPlayerAudioProcessorEditor (MidiPlayerAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p)
+MidiPlayerAudioProcessorEditor::MidiPlayerAudioProcessorEditor(MidiPlayerAudioProcessor& p)
+:   AudioProcessorEditor (&p),
+    audioProcessor (p),
+    content(&p)
 {
-    // Make sure that before the constructor has finished, you've set the
-    // editor's size to whatever you need it to be.
+    /* add the content to the scene */
+    /* the content will be scaled by the editor */
+    addAndMakeVisible(content);
+    
+    /* initialize editor */
+    /* editor should be resizable...*/
+    setResizable(true, true);
+    
+    /* ...but we want it to retain a specific aspect ratio */
+    juce::ComponentBoundsConstrainer *constrainer = getConstrainer();
+    
+    /* set the min and max sizes */
+    constrainer->setSizeLimits(400, 300, 800, 600);
+        
+    /* set the aspect ratio */
+    constrainer->setFixedAspectRatio(400.f / 300.f);
+    
+    /* set the default size */
     setSize (400, 300);
-}
-
-MidiPlayerAudioProcessorEditor::~MidiPlayerAudioProcessorEditor()
-{
-}
-
-//==============================================================================
-void MidiPlayerAudioProcessorEditor::paint (juce::Graphics& g)
-{
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
-
-    g.setColour (juce::Colours::white);
-    g.setFont (15.0f);
-    g.drawFittedText ("Hello World!", getLocalBounds(), juce::Justification::centred, 1);
+    content.setBounds(0, 0, getWidth(), getHeight());
 }
 
 void MidiPlayerAudioProcessorEditor::resized()
 {
-    // This is generally where you'll want to lay out the positions of any
-    // subcomponents in your editor..
+    /* get the scale factor and set the transform */
+    float factor = static_cast<float>(getHeight()) / static_cast<float>(300);
+    content.setTransform(juce::AffineTransform::scale(factor));
 }
