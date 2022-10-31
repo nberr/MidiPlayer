@@ -27,19 +27,19 @@ MidiPlayerAudioProcessorEditor::MidiPlayerAudioProcessorEditor(MidiPlayerAudioPr
     juce::ComponentBoundsConstrainer *constrainer = getConstrainer();
     
     /* set the min and max sizes */
-    constrainer->setSizeLimits(400, 300, 800, 600);
+    constrainer->setSizeLimits(min_width, min_height, max_width, max_height);
         
     /* set the aspect ratio */
-    constrainer->setFixedAspectRatio(400.f / 300.f);
+    constrainer->setFixedAspectRatio(static_cast<float>(min_width) / static_cast<float>(min_height));
     
     /* set the default size */
-    setSize (400, 300);
+    setSize (min_width, min_height);
     content.setBounds(0, 0, getWidth(), getHeight());
 }
 
 void MidiPlayerAudioProcessorEditor::resized()
 {
     /* get the scale factor and set the transform */
-    float factor = static_cast<float>(getHeight()) / static_cast<float>(300);
+    float factor = static_cast<float>(getHeight()) / static_cast<float>(min_height);
     content.setTransform(juce::AffineTransform::scale(factor));
 }
