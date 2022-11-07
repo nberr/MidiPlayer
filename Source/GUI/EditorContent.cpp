@@ -19,7 +19,13 @@ EditorContent::EditorContent(MidiPlayerAudioProcessor* inProcessor)
 //==============================================================================
 void EditorContent::paint(juce::Graphics& g)
 {
-    g.fillAll(juce::Colours::wheat);
+    // upper rectangle
+    g.setColour(juce::Colour(13, 13, 13));
+    g.fillRect(0, 0, 300, 60);
+    
+    // lower rectangle
+    g.setColour(juce::Colour(26, 26, 26));
+    g.fillRect(0, 60, 300, 180);
 }
 
 void EditorContent::resized()

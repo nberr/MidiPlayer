@@ -15,10 +15,10 @@
 
 //==============================================================================
 static constexpr int min_width = 300;
-static constexpr int min_height = 200;
+static constexpr int min_height = 220;
 
 static constexpr int max_width = 900;
-static constexpr int max_height = 600;
+static constexpr int max_height = 660;
 
 //==============================================================================
 class MidiPlayerAudioProcessorEditor  : public juce::AudioProcessorEditor
