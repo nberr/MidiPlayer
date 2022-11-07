@@ -5,6 +5,11 @@
               version="1.0.0" companyName="Spite" pluginCharacteristicsValue="pluginIsMidiEffectPlugin,pluginProducesMidiOut,pluginWantsMidiIn"
               cppLanguageStandard="latest">
   <MAINGROUP id="QHCWTA" name="MidiPlayer">
+    <GROUP id="{F1FF27FF-CD62-7951-4DC7-2F56AC927368}" name="Assets">
+      <FILE id="CM9vUc" name="folder.svg" compile="0" resource="1" file="Assets/folder.svg"/>
+      <FILE id="dgua4j" name="left.svg" compile="0" resource="1" file="Assets/left.svg"/>
+      <FILE id="XlwHhG" name="right.svg" compile="0" resource="1" file="Assets/right.svg"/>
+    </GROUP>
     <GROUP id="{9C6729F6-2090-5AF8-4D54-016C0BC68488}" name="Source">
       <GROUP id="{79548204-9B11-9561-7468-716ABB24ED1D}" name="GUI">
         <FILE id="eyYn79" name="EditorContent.cpp" compile="1" resource="0"

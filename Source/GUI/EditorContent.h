@@ -29,6 +29,12 @@ private:
     //==============================================================================
     MidiPlayerAudioProcessor* processor;
     
+    juce::DrawableButton dirButton;
+    juce::DrawableButton prevButton;
+    juce::DrawableButton nextButton;
+    
+    juce::Label fileLabel;
+    
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EditorContent)
 };
