@@ -29,9 +29,22 @@ private:
     //==============================================================================
     MidiPlayerAudioProcessor* processor;
     
+    //==============================================================================
+    std::unique_ptr<juce::Drawable> waveIcon;
+    
+    //==============================================================================
     juce::DrawableButton dirButton;
     juce::DrawableButton prevButton;
     juce::DrawableButton nextButton;
+    
+    //==============================================================================
+    void loadFiles();
+    void loadNextFile();
+    void loadPrevFile();
+    
+    std::unique_ptr<juce::FileChooser> fileChooser;
+    juce::Array<juce::File> midiFiles;
+    int fileIndex = -1;
     
     juce::Label fileLabel;
     
