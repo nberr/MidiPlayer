@@ -89,6 +89,10 @@ void MidiPlayerAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
     juce::ignoreUnused(sampleRate, samplesPerBlock);
+    
+    for (auto& note : noteHistory) {
+        note = false;
+    }
 }
 
 void MidiPlayerAudioProcessor::releaseResources()
@@ -99,7 +103,40 @@ void MidiPlayerAudioProcessor::releaseResources()
 
 void MidiPlayerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    juce::ignoreUnused(buffer, midiMessages);
+    /* not interested in audio data */
+    juce::ignoreUnused(buffer);
+    
+    for (auto metadata : midiMessages) {
+        
+        /* get the message and note number */
+        auto msg = metadata.getMessage();
+        int note = msg.getNoteNumber();
+
+        
+        /* only interested in on and off messages */
+        if (msg.isNoteOn()) {
+            
+            /* start sequence only if this is the first note on */
+            if (!noteHistory.contains(true)) {
+                /* sequence isn't currently playing so we need to start it */
+            }
+            
+            /* turn the note on */
+            noteHistory.getReference(note) = true;
+        }
+        else if (msg.isNoteOff()) {
+           
+            /* turn the note off */
+            noteHistory.getReference(note) = false;
+            
+            /* end sequence only if all notes are off */
+            if (!noteHistory.contains(true)) {
+                
+                /* all notes are off. stop the sequence */
+                
+            }
+        }
+    }
 }
 
 //==============================================================================
@@ -127,6 +164,31 @@ void MidiPlayerAudioProcessor::setStateInformation (const void* data, int sizeIn
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
     juce::ignoreUnused(data, sizeInBytes);
+}
+
+//==============================================================================
+void MidiPlayerAudioProcessor::loadMIDIFile(juce::File f)
+{
+    const juce::ScopedLock myScopedLock(processLock);
+    
+    fileBuffer.clear();
+    loadedFile.clear();
+    
+    juce::FileInputStream s(f);
+    loadedFile.readFrom(s);
+
+    auto seq = *loadedFile.getTrack(0);
+    
+    for (auto metadata : seq) {
+        auto msg = metadata->message;
+        
+        if (msg.isNoteOn()) {
+            fileBuffer.addEvent(msg, static_cast<int>(msg.getTimeStamp()));
+        }
+        else if (msg.isNoteOff()) {
+            fileBuffer.addEvent(msg, static_cast<int>(msg.getTimeStamp()));
+        }
+    }
 }
 
 //==============================================================================

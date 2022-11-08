@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="hVblPl" name="MidiPlayer" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
-              version="1.0.0" companyName="Spite" pluginCharacteristicsValue="pluginIsMidiEffectPlugin,pluginProducesMidiOut,pluginWantsMidiIn"
+              version="1.0.0" companyName="SPITE" pluginCharacteristicsValue="pluginIsMidiEffectPlugin,pluginProducesMidiOut,pluginWantsMidiIn"
               cppLanguageStandard="latest">
   <MAINGROUP id="QHCWTA" name="MidiPlayer">
     <GROUP id="{F1FF27FF-CD62-7951-4DC7-2F56AC927368}" name="Assets">

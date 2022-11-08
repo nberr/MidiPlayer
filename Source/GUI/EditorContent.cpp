@@ -128,8 +128,6 @@ void EditorContent::loadFiles()
             return;
         }
         
-        DBG("file okay");
-        
         /* search the rest of the directory for midi files */
         juce::RangedDirectoryIterator it (midi_file.getParentDirectory(), false, "*.mid");
         
@@ -150,7 +148,7 @@ void EditorContent::loadFiles()
         }
         
         fileLabel.setText(midiFiles.getReference(fileIndex).getFileName(), juce::sendNotification);
-        // audioProcessor.loadMIDIFile(midiFiles.getReference(fileIndex));
+        processor->loadMIDIFile(midiFiles.getReference(fileIndex));
     });
 }
 
@@ -167,7 +165,7 @@ void EditorContent::loadNextFile()
     }
     
     fileLabel.setText(midiFiles.getReference(fileIndex).getFileName(), juce::sendNotification);
-    //audioProcessor.loadMIDIFile(midiFiles.getReference(fileIndex));
+    processor->loadMIDIFile(midiFiles.getReference(fileIndex));
 }
 
 void EditorContent::loadPrevFile()
@@ -183,5 +181,5 @@ void EditorContent::loadPrevFile()
     }
     
     fileLabel.setText(midiFiles.getReference(fileIndex).getFileName(), juce::sendNotification);
-    //audioProcessor.loadMIDIFile(midiFiles.getReference(fileIndex));
+    processor->loadMIDIFile(midiFiles.getReference(fileIndex));
 }
