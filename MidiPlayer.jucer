@@ -3,13 +3,21 @@
 <JUCERPROJECT id="hVblPl" name="MidiPlayer" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
               version="1.0.0" companyName="SPITE" pluginCharacteristicsValue="pluginIsMidiEffectPlugin,pluginProducesMidiOut,pluginWantsMidiIn"
-              cppLanguageStandard="latest">
+              cppLanguageStandard="latest" companyWebsite="https://store.spiteaudiotools.com/">
   <MAINGROUP id="QHCWTA" name="MidiPlayer">
     <GROUP id="{F1FF27FF-CD62-7951-4DC7-2F56AC927368}" name="Assets">
-      <FILE id="jVdlTZ" name="folder.svg" compile="0" resource="1" file="Assets/folder.svg"/>
-      <FILE id="AQQ0UA" name="left.svg" compile="0" resource="1" file="Assets/left.svg"/>
-      <FILE id="Ff3NyX" name="right.svg" compile="0" resource="1" file="Assets/right.svg"/>
-      <FILE id="y8B5nS" name="wave.svg" compile="0" resource="1" file="Assets/wave.svg"/>
+      <GROUP id="{FB439F49-3C3E-D540-1076-54C2D4A24A94}" name="Main">
+        <FILE id="PM6AK7" name="arrow.svg" compile="0" resource="1" file="Assets/Main/arrow.svg"/>
+        <FILE id="EhAaX2" name="backplate.svg" compile="0" resource="1" file="Assets/Main/backplate.svg"/>
+        <FILE id="YrxZ5U" name="folder.svg" compile="0" resource="1" file="Assets/Main/folder.svg"/>
+        <FILE id="sd3SlW" name="hamburger.svg" compile="0" resource="1" file="Assets/Main/hamburger.svg"/>
+      </GROUP>
+      <GROUP id="{583B3627-6745-C296-EB4D-4D7D0F5784E3}" name="Overlay">
+        <FILE id="ZPOYBt" name="close.svg" compile="0" resource="1" file="Assets/Overlay/close.svg"/>
+        <FILE id="tMU0tL" name="link.svg" compile="0" resource="1" file="Assets/Overlay/link.svg"/>
+        <FILE id="foiTfa" name="overlay_backplate.svg" compile="0" resource="1"
+              file="Assets/Overlay/overlay_backplate.svg"/>
+      </GROUP>
     </GROUP>
     <GROUP id="{9C6729F6-2090-5AF8-4D54-016C0BC68488}" name="Source">
       <GROUP id="{79548204-9B11-9561-7468-716ABB24ED1D}" name="GUI">

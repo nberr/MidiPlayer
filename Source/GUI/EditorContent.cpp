@@ -12,17 +12,29 @@
 
 //==============================================================================
 EditorContent::EditorContent(MidiPlayerAudioProcessor* inProcessor)
-:   dirButton("directory", juce::DrawableButton::ButtonStyle::ImageFitted),
+:   infoButton("info", juce::DrawableButton::ButtonStyle::ImageFitted),
+    dirButton("directory", juce::DrawableButton::ButtonStyle::ImageFitted),
     prevButton("previous", juce::DrawableButton::ButtonStyle::ImageFitted),
-    nextButton("next", juce::DrawableButton::ButtonStyle::ImageFitted)
-    
+    nextButton("next", juce::DrawableButton::ButtonStyle::ImageFitted),
+    closeButton("close", juce::DrawableButton::ButtonStyle::ImageFitted),
+    linkButton("link", juce::DrawableButton::ButtonStyle::ImageFitted)
 {
     processor = inProcessor;
     
-    // wave icon
-    waveIcon = juce::Drawable::createFromImageData(BinaryData::wave_svg, BinaryData::wave_svgSize);
-    addAndMakeVisible(waveIcon.get());
+    // backplate
+    backplate = juce::Drawable::createFromImageData(BinaryData::backplate_svg, BinaryData::backplate_svgSize);
+    addAndMakeVisible(backplate.get());
+    backplate->toBack();
 
+    // hamburger
+    auto info_btn_data = juce::XmlDocument::parse(BinaryData::hamburger_svg);
+    auto info_btn_path = juce::Drawable::createFromSVG(*info_btn_data);
+    
+    infoButton.setImages(info_btn_path.get());
+    
+    infoButton.onClick = [this] { showOverlay(); };
+    
+    addAndMakeVisible(infoButton);
     
     // directory icon
     auto dir_btn_data = juce::XmlDocument::parse(BinaryData::folder_svg);
@@ -35,7 +47,7 @@ EditorContent::EditorContent(MidiPlayerAudioProcessor* inProcessor)
     addAndMakeVisible(dirButton);
     
     // previous arrow
-    auto prev_btn_data = juce::XmlDocument::parse(BinaryData::left_svg);
+    auto prev_btn_data = juce::XmlDocument::parse(BinaryData::arrow_svg);
     auto prev_btn_path = juce::Drawable::createFromSVG(*prev_btn_data);
     
     prevButton.setImages(prev_btn_path.get());
@@ -45,70 +57,71 @@ EditorContent::EditorContent(MidiPlayerAudioProcessor* inProcessor)
     addAndMakeVisible(prevButton);
     
     // next arrow
-    auto next_btn_data = juce::XmlDocument::parse(BinaryData::right_svg);
+    auto next_btn_data = juce::XmlDocument::parse(BinaryData::arrow_svg);
     auto next_btn_path = juce::Drawable::createFromSVG(*next_btn_data);
     
     nextButton.setImages(next_btn_path.get());
     
     nextButton.onClick = [this] { loadNextFile(); };
     
+    nextButton.setTransform(juce::AffineTransform::rotation(juce::MathConstants<float>::pi, 90, 130));
+    
     addAndMakeVisible(nextButton);
     
     // file control
     fileChooser = std::make_unique<juce::FileChooser>("Please select the MIDI file you want to load...",
-                                                              juce::File::getSpecialLocation(juce::File::userHomeDirectory),
+                                                              juce::File::getSpecialLocation(juce::File::userMusicDirectory),
                                                               "*.mid");
     
     // file display
     fileLabel.setColour(juce::Label::ColourIds::textColourId, juce::Colour(240, 240, 200));
     addAndMakeVisible(fileLabel);
+    
+    // overlay
+    overlayBackplate = juce::Drawable::createFromImageData(BinaryData::overlay_backplate_svg, BinaryData::overlay_backplate_svgSize);
+    addChildComponent(overlayBackplate.get());
+    
+    // close
+    auto close_btn_data = juce::XmlDocument::parse(BinaryData::close_svg);
+    auto close_btn_path = juce::Drawable::createFromSVG(*close_btn_data);
+    
+    closeButton.setImages(close_btn_path.get());
+    
+    closeButton.onClick = [this] { hideOverlay(); };
+    
+    addChildComponent(closeButton);
+    
+    // link
+    auto link_btn_data = juce::XmlDocument::parse(BinaryData::link_svg);
+    auto link_btn_path = juce::Drawable::createFromSVG(*link_btn_data);
+    
+    linkButton.setImages(link_btn_path.get());
+    
+    linkButton.onClick = [] {
+        if (!juce::URL(JucePlugin_ManufacturerWebsite).launchInDefaultBrowser()) {
+            jassertfalse;
+        }
+    };
+    
+    addChildComponent(linkButton);
 }
 
 //==============================================================================
-void EditorContent::paint(juce::Graphics& g)
-{
-    // upper rectangle
-    g.setColour(juce::Colour(13, 13, 13));
-    g.fillRect(0, 0, 300, 60);
-    
-    // plugin name
-    g.setColour(juce::Colours::white);
-    g.setFont(g.getCurrentFont().withHeight(24));
-    g.drawText("MIDI PLAYER", 40, 19, 130, 24, juce::Justification::left);
-    
-    // lower rectangle
-    g.setColour(juce::Colour(26, 26, 26));
-    g.fillRect(0, 60, 300, 180);
-    
-    // controls rectangle
-    g.setColour(juce::Colour(13, 13, 13));
-    g.fillRoundedRectangle(15, 110, 270, 40, 4);
-    
-    // upper line
-    g.setColour(juce::Colour(20, 20, 20));
-    g.fillRect(15, 170, 270, 2);
-    
-    // lower line
-    g.setColour(juce::Colour(28, 28, 28));
-    g.fillRect(15, 172, 270, 2);
-    
-    // company name
-    g.setColour(juce::Colour(60, 65, 70));
-    g.setFont(g.getCurrentFont().withHeight(20));
-    g.drawText("SPITE", 200, 185, 90, 20, juce::Justification::centred);
-}
-
 void EditorContent::resized()
 {
-    auto bounds = juce::Rectangle<int>(14, 20, 20, 20);
+    backplate->setTransformToFit(getLocalBounds().toFloat(), juce::RectanglePlacement::stretchToFit);
+    overlayBackplate->setTransformToFit(getLocalBounds().toFloat(), juce::RectanglePlacement::stretchToFit);
     
-    waveIcon->setTransformToFit(bounds.toFloat(), juce::RectanglePlacement::stretchToFit);
+    infoButton.setBounds(217, 25, 20, 20);
+    closeButton.setBounds(217, 25, 20, 20);
     
     dirButton.setBounds(30, 120, 20, 20);
     prevButton.setBounds(60, 120, 20, 20);
     nextButton.setBounds(80, 120, 20, 20);
     
     fileLabel.setBounds(100, 120, 160, 20);
+    
+    linkButton.setBounds(100, 140, 160, 20);
 }
 
 //==============================================================================
@@ -182,4 +195,19 @@ void EditorContent::loadPrevFile()
     
     fileLabel.setText(midiFiles.getReference(fileIndex).getFileName(), juce::sendNotification);
     processor->loadMIDIFile(midiFiles.getReference(fileIndex));
+}
+
+//==============================================================================
+void EditorContent::showOverlay()
+{
+    overlayBackplate->setVisible(true);
+    closeButton.setVisible(true);
+    linkButton.setVisible(true);
+}
+
+void EditorContent::hideOverlay()
+{
+    overlayBackplate->setVisible(false);
+    closeButton.setVisible(false);
+    linkButton.setVisible(false);
 }

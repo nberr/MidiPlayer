@@ -22,7 +22,6 @@ public:
     EditorContent(MidiPlayerAudioProcessor* inProcessor);
     
     //==============================================================================
-    void paint(juce::Graphics& g) override;
     void resized() override;
     
 private:
@@ -30,7 +29,11 @@ private:
     MidiPlayerAudioProcessor* processor;
     
     //==============================================================================
-    std::unique_ptr<juce::Drawable> waveIcon;
+    // Main
+    std::unique_ptr<juce::Drawable> backplate;
+    
+    void showOverlay();
+    juce::DrawableButton infoButton;
     
     //==============================================================================
     juce::DrawableButton dirButton;
@@ -47,6 +50,14 @@ private:
     int fileIndex = -1;
     
     juce::Label fileLabel;
+    
+    //==============================================================================
+    // Overlay
+    std::unique_ptr<juce::Drawable> overlayBackplate;
+    
+    void hideOverlay();
+    juce::DrawableButton closeButton;
+    juce::DrawableButton linkButton;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EditorContent)
