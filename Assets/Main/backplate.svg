@@ -82,7 +82,7 @@
         </g>
     </g>
     <g id="Header" transform="matrix(1,0,0,1,-0.5,0)">
-        <g id="Header-Background" serif:id="Header Background" transform="matrix(1,0,0,1.00073,0,0)">
+        <g id="Header-Background" serif:id="Header Background" transform="matrix(1,0,0,1.00073,0.5,0)">
             <rect x="0" y="0" width="350" height="63.953" style="fill:rgb(13,13,13);"/>
         </g>
         <g transform="matrix(1,0,0,1,-22.9458,-15.1212)">

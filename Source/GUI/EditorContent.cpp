@@ -12,12 +12,12 @@
 
 //==============================================================================
 EditorContent::EditorContent(MidiPlayerAudioProcessor* inProcessor)
-:   infoButton("info", juce::DrawableButton::ButtonStyle::ImageFitted),
-    dirButton("directory", juce::DrawableButton::ButtonStyle::ImageFitted),
+:   infoButton("info", juce::DrawableButton::ButtonStyle::ImageStretched),
+    dirButton("directory", juce::DrawableButton::ButtonStyle::ImageStretched),
     prevButton("previous", juce::DrawableButton::ButtonStyle::ImageFitted),
     nextButton("next", juce::DrawableButton::ButtonStyle::ImageFitted),
-    closeButton("close", juce::DrawableButton::ButtonStyle::ImageFitted),
-    linkButton("link", juce::DrawableButton::ButtonStyle::ImageFitted)
+    closeButton("close", juce::DrawableButton::ButtonStyle::ImageStretched),
+    linkButton("link", juce::DrawableButton::ButtonStyle::ImageStretched)
 {
     processor = inProcessor;
     
@@ -25,7 +25,8 @@ EditorContent::EditorContent(MidiPlayerAudioProcessor* inProcessor)
     backplate = juce::Drawable::createFromImageData(BinaryData::backplate_svg, BinaryData::backplate_svgSize);
     addAndMakeVisible(backplate.get());
     backplate->toBack();
-
+    backplate->setBufferedToImage(true);
+    
     // hamburger
     auto info_btn_data = juce::XmlDocument::parse(BinaryData::hamburger_svg);
     auto info_btn_path = juce::Drawable::createFromSVG(*info_btn_data);
@@ -62,9 +63,12 @@ EditorContent::EditorContent(MidiPlayerAudioProcessor* inProcessor)
     
     nextButton.setImages(next_btn_path.get());
     
-    nextButton.onClick = [this] { loadNextFile(); };
+    // rotation values
+    // x-rot: x + (0.5f*width)
+    // y-rot: y + (0.5f*height)
+    nextButton.setTransform(juce::AffineTransform::rotation(juce::MathConstants<float>::pi, 82.5f, 126.5f));
     
-    nextButton.setTransform(juce::AffineTransform::rotation(juce::MathConstants<float>::pi, 90, 130));
+    nextButton.onClick = [this] { loadNextFile(); };
     
     addAndMakeVisible(nextButton);
     
@@ -107,21 +111,26 @@ EditorContent::EditorContent(MidiPlayerAudioProcessor* inProcessor)
 }
 
 //==============================================================================
+//void EditorContent::paintOverChildren(juce::Graphics& g)
+//{
+//    juce::ignoreUnused(g);
+//}
+
 void EditorContent::resized()
 {
     backplate->setTransformToFit(getLocalBounds().toFloat(), juce::RectanglePlacement::stretchToFit);
     overlayBackplate->setTransformToFit(getLocalBounds().toFloat(), juce::RectanglePlacement::stretchToFit);
     
-    infoButton.setBounds(217, 25, 20, 20);
-    closeButton.setBounds(217, 25, 20, 20);
+    infoButton.setBounds(317, 25, 13, 12);
+    closeButton.setBounds(317, 26, 11, 11);
     
-    dirButton.setBounds(30, 120, 20, 20);
-    prevButton.setBounds(60, 120, 20, 20);
-    nextButton.setBounds(80, 120, 20, 20);
+    dirButton.setBounds(32, 118, 18, 14);
+    prevButton.setBounds(60, 119, 15, 15);
+    nextButton.setBounds(75, 119, 15, 15);
     
-    fileLabel.setBounds(100, 120, 160, 20);
+    fileLabel.setBounds(100, 121, 160, 20);
     
-    linkButton.setBounds(100, 140, 160, 20);
+    linkButton.setBounds(105, 139, 141, 11);
 }
 
 //==============================================================================

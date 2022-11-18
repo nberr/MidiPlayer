@@ -14,11 +14,11 @@
 #include "GUI/EditorContent.h"
 
 //==============================================================================
-static constexpr int min_width = 300;
-static constexpr int min_height = 220;
+static constexpr int min_width = 350;
+static constexpr int min_height = 225;
 
-static constexpr int max_width = 900;
-static constexpr int max_height = 660;
+static constexpr int max_width = 1050;
+static constexpr int max_height = 675;
 
 //==============================================================================
 class MidiPlayerAudioProcessorEditor  : public juce::AudioProcessorEditor

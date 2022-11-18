@@ -22,6 +22,7 @@ public:
     EditorContent(MidiPlayerAudioProcessor* inProcessor);
     
     //==============================================================================
+    //void paintOverChildren(juce::Graphics& g) override;
     void resized() override;
     
 private:

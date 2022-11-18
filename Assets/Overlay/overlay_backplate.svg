@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg width="100%" height="100%" viewBox="0 0 350 225" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g id="Background" transform="matrix(1.00071,0,0,1,-0.25,0)">
-        <rect x="0" y="0" width="350" height="225" style="fill:rgb(26,26,26);"/>
-    </g>
+    <rect id="Background" x="0" y="0" width="350" height="225" style="fill:rgb(26,26,26);"/>
     <g id="Footer" transform="matrix(1,0,0,1,-0.0156356,0)">
         <g transform="matrix(0.576869,0,0,0.576869,66.0478,170.335)">
             <g transform="matrix(18.0572,0,0,18.0572,92.9662,54.7918)">
@@ -64,8 +62,8 @@
             </g>
         </g>
     </g>
-    <g transform="matrix(0.255379,0,0,0.255379,46.6053,114.518)">
-        <g id="Mid-Section" serif:id="Mid Section">
+    <g id="Mid-Section" serif:id="Mid Section" transform="matrix(1,0,0,1,37.203,-11)">
+        <g transform="matrix(0.255379,0,0,0.255379,9.40222,125.518)">
             <g transform="matrix(48.9469,0,0,48.9469,116.532,76.6434)">
                 <path d="M0.077,-0.727L0.03,-0.727L0.293,-0L0.344,-0L0.606,-0.727L0.559,-0.727L0.321,-0.057L0.316,-0.057L0.077,-0.727Z" style="fill:rgb(191,191,191);fill-rule:nonzero;"/>
             </g>
@@ -163,9 +161,7 @@
                 <path d="M0.13,-0.415C0.151,-0.415 0.169,-0.433 0.169,-0.454C0.169,-0.475 0.151,-0.492 0.13,-0.492C0.109,-0.492 0.092,-0.475 0.092,-0.454C0.092,-0.433 0.109,-0.415 0.13,-0.415ZM0.13,-0.033C0.151,-0.033 0.169,-0.05 0.169,-0.072C0.169,-0.093 0.151,-0.11 0.13,-0.11C0.109,-0.11 0.092,-0.093 0.092,-0.072C0.092,-0.05 0.109,-0.033 0.13,-0.033Z" style="fill:rgb(191,191,191);fill-rule:nonzero;"/>
             </g>
         </g>
-    </g>
-    <g transform="matrix(0.255379,0,0,0.255379,95.6287,74.5178)">
-        <g id="Mid-Section1" serif:id="Mid Section">
+        <g transform="matrix(0.255379,0,0,0.255379,58.4257,85.5178)">
             <g transform="matrix(48.9469,0,0,48.9469,116.532,76.6434)">
                 <path d="M0.105,-0L0.15,-0L0.15,-0.29L0.33,-0.29C0.467,-0.29 0.551,-0.383 0.551,-0.509C0.551,-0.635 0.467,-0.727 0.329,-0.727L0.105,-0.727L0.105,-0ZM0.15,-0.331L0.15,-0.686L0.328,-0.686C0.44,-0.686 0.507,-0.612 0.507,-0.509C0.507,-0.406 0.44,-0.331 0.328,-0.331L0.15,-0.331Z" style="fill:rgb(191,191,191);fill-rule:nonzero;"/>
             </g>
@@ -217,7 +213,7 @@
         </g>
     </g>
     <g id="Header" transform="matrix(1,0,0,1,-0.25,0)">
-        <g id="Header-Background" serif:id="Header Background" transform="matrix(1.00071,0,0,1.00073,0,0)">
+        <g id="Header-Background" serif:id="Header Background" transform="matrix(1,0,0,1.00073,0.25,0)">
             <rect x="0" y="0" width="350" height="63.953" style="fill:rgb(13,13,13);"/>
         </g>
         <g transform="matrix(1,0,0,1,-22.9458,-15.1212)">
