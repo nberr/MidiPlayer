@@ -6,16 +6,20 @@
               cppLanguageStandard="latest" companyWebsite="https://store.spiteaudiotools.com/">
   <MAINGROUP id="QHCWTA" name="MidiPlayer">
     <GROUP id="{F1FF27FF-CD62-7951-4DC7-2F56AC927368}" name="Assets">
-      <GROUP id="{FB439F49-3C3E-D540-1076-54C2D4A24A94}" name="Main">
-        <FILE id="I9uCFS" name="arrow.svg" compile="0" resource="1" file="Assets/Main/arrow.svg"/>
-        <FILE id="HLvviJ" name="backplate.svg" compile="0" resource="1" file="Assets/Main/backplate.svg"/>
-        <FILE id="bXXAtk" name="folder.svg" compile="0" resource="1" file="Assets/Main/folder.svg"/>
-        <FILE id="V3dilN" name="hamburger.svg" compile="0" resource="1" file="Assets/Main/hamburger.svg"/>
+      <GROUP id="{5D0FCEE9-D4EA-167C-5941-C98D7708574B}" name="Fonts">
+        <FILE id="oMdeXN" name="Inter-Regular.otf" compile="0" resource="1"
+              file="Assets/Fonts/Inter-Regular.otf"/>
       </GROUP>
-      <GROUP id="{583B3627-6745-C296-EB4D-4D7D0F5784E3}" name="Overlay">
-        <FILE id="jvn9Mx" name="close.svg" compile="0" resource="1" file="Assets/Overlay/close.svg"/>
-        <FILE id="Xs52WL" name="link.svg" compile="0" resource="1" file="Assets/Overlay/link.svg"/>
-        <FILE id="b7eDiB" name="overlay_backplate.svg" compile="0" resource="1"
+      <GROUP id="{FB439F49-3C3E-D540-1076-54C2D4A24A94}" name="Main">
+        <FILE id="ithKJX" name="arrow.svg" compile="0" resource="1" file="Assets/Main/arrow.svg"/>
+        <FILE id="GVtdAW" name="backplate.svg" compile="0" resource="1" file="Assets/Main/backplate.svg"/>
+        <FILE id="d1qk5K" name="folder.svg" compile="0" resource="1" file="Assets/Main/folder.svg"/>
+        <FILE id="eDPgiT" name="hamburger.svg" compile="0" resource="1" file="Assets/Main/hamburger.svg"/>
+      </GROUP>
+      <GROUP id="{2FD73A6B-5EFE-309A-E6D3-8D5A7F1B7E71}" name="Overlay">
+        <FILE id="IYSSku" name="close.svg" compile="0" resource="1" file="Assets/Overlay/close.svg"/>
+        <FILE id="c0EdzB" name="link.svg" compile="0" resource="1" file="Assets/Overlay/link.svg"/>
+        <FILE id="VINDFK" name="overlay_backplate.svg" compile="0" resource="1"
               file="Assets/Overlay/overlay_backplate.svg"/>
       </GROUP>
     </GROUP>

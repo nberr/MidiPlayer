@@ -21,6 +21,7 @@ EditorContent::EditorContent(MidiPlayerAudioProcessor* inProcessor)
 {
     processor = inProcessor;
     
+    //==============================================================================
     // backplate
     backplate = juce::Drawable::createFromImageData(BinaryData::backplate_svg, BinaryData::backplate_svgSize);
     addAndMakeVisible(backplate.get());
@@ -78,9 +79,16 @@ EditorContent::EditorContent(MidiPlayerAudioProcessor* inProcessor)
                                                               "*.mid");
     
     // file display
-    fileLabel.setColour(juce::Label::ColourIds::textColourId, juce::Colour(240, 240, 200));
+    fileLabel.setColour(juce::Label::ColourIds::textColourId, juce::Colour(103, 201, 203));
+    
+    auto font = juce::Typeface::createSystemTypefaceFor(BinaryData::InterRegular_otf, BinaryData::InterRegular_otfSize);
+    fileLabel.setFont(juce::Font(font).withHeight(12));
+    
     addAndMakeVisible(fileLabel);
     
+    
+    
+    //==============================================================================
     // overlay
     overlayBackplate = juce::Drawable::createFromImageData(BinaryData::overlay_backplate_svg, BinaryData::overlay_backplate_svgSize);
     addChildComponent(overlayBackplate.get());
@@ -113,7 +121,8 @@ EditorContent::EditorContent(MidiPlayerAudioProcessor* inProcessor)
 //==============================================================================
 //void EditorContent::paintOverChildren(juce::Graphics& g)
 //{
-//    juce::ignoreUnused(g);
+//    g.setColour(juce::Colours::green);
+//    g.drawRect(fileLabel.getBounds());
 //}
 
 void EditorContent::resized()
@@ -128,7 +137,7 @@ void EditorContent::resized()
     prevButton.setBounds(60, 119, 15, 15);
     nextButton.setBounds(75, 119, 15, 15);
     
-    fileLabel.setBounds(100, 121, 160, 20);
+    fileLabel.setBounds(100, 121, 160, 12);
     
     linkButton.setBounds(105, 139, 141, 11);
 }
@@ -169,7 +178,7 @@ void EditorContent::loadFiles()
             ++index;
         }
         
-        fileLabel.setText(midiFiles.getReference(fileIndex).getFileName(), juce::sendNotification);
+        fileLabel.setText(midiFiles.getReference(fileIndex).getFileNameWithoutExtension(), juce::sendNotification);
         processor->loadMIDIFile(midiFiles.getReference(fileIndex));
     });
 }
@@ -186,7 +195,7 @@ void EditorContent::loadNextFile()
         fileIndex = 0;
     }
     
-    fileLabel.setText(midiFiles.getReference(fileIndex).getFileName(), juce::sendNotification);
+    fileLabel.setText(midiFiles.getReference(fileIndex).getFileNameWithoutExtension(), juce::sendNotification);
     processor->loadMIDIFile(midiFiles.getReference(fileIndex));
 }
 
@@ -202,7 +211,7 @@ void EditorContent::loadPrevFile()
         fileIndex = midiFiles.size() - 1;
     }
     
-    fileLabel.setText(midiFiles.getReference(fileIndex).getFileName(), juce::sendNotification);
+    fileLabel.setText(midiFiles.getReference(fileIndex).getFileNameWithoutExtension(), juce::sendNotification);
     processor->loadMIDIFile(midiFiles.getReference(fileIndex));
 }
 
