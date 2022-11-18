@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 11 11" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="Menu-Button" serif:id="Menu Button" transform="matrix(1.00317,0,0,1,-320.193,-25.6748)">
+        <g transform="matrix(0.707107,-0.709347,0.691784,0.693975,77.0077,243.042)">
+            <rect x="317.98" y="25.049" width="12.959" height="2.038" style="fill:rgb(51,51,51);"/>
+        </g>
+        <g transform="matrix(0.707107,0.709347,-0.691784,0.693975,113.074,-217.196)">
+            <rect x="317.98" y="25.049" width="12.959" height="2.038" style="fill:rgb(51,51,51);"/>
+        </g>
+    </g>
+</svg>

@@ -28,11 +28,26 @@ EditorContent::EditorContent(MidiPlayerAudioProcessor* inProcessor)
     backplate->toBack();
     backplate->setBufferedToImage(true);
     
+    /*
+     void setImages (const Drawable* normalImage,
+                     const Drawable* overImage       = nullptr,
+                     const Drawable* downImage       = nullptr,
+                     const Drawable* disabledImage   = nullptr,
+                     const Drawable* normalImageOn   = nullptr,
+                     const Drawable* overImageOn     = nullptr,
+                     const Drawable* downImageOn     = nullptr,
+                     const Drawable* disabledImageOn = nullptr);
+     */
+    
     // hamburger
     auto info_btn_data = juce::XmlDocument::parse(BinaryData::hamburger_svg);
     auto info_btn_path = juce::Drawable::createFromSVG(*info_btn_data);
     
-    infoButton.setImages(info_btn_path.get());
+    auto info_hover_btn_data = juce::XmlDocument::parse(BinaryData::hamburger_hover_svg);
+    auto info_hover_btn_path = juce::Drawable::createFromSVG(*info_hover_btn_data);
+    
+    infoButton.setImages(info_btn_path.get(),
+                         info_hover_btn_path.get());
     
     infoButton.onClick = [this] { showOverlay(); };
     
@@ -42,27 +57,41 @@ EditorContent::EditorContent(MidiPlayerAudioProcessor* inProcessor)
     auto dir_btn_data = juce::XmlDocument::parse(BinaryData::folder_svg);
     auto dir_btn_path = juce::Drawable::createFromSVG(*dir_btn_data);
     
-    dirButton.setImages(dir_btn_path.get());
+    auto dir_hover_btn_data = juce::XmlDocument::parse(BinaryData::folder_hover_svg);
+    auto dir_hover_btn_path = juce::Drawable::createFromSVG(*dir_hover_btn_data);
+    
+    dirButton.setImages(dir_btn_path.get(),
+                        dir_hover_btn_path.get());
     
     dirButton.onClick = [this] { loadFiles(); };
     
     addAndMakeVisible(dirButton);
     
-    // previous arrow
-    auto prev_btn_data = juce::XmlDocument::parse(BinaryData::arrow_svg);
-    auto prev_btn_path = juce::Drawable::createFromSVG(*prev_btn_data);
+    // previous and next arrow
+    auto arrow_btn_data = juce::XmlDocument::parse(BinaryData::arrow_svg);
+    auto arrow_btn_path = juce::Drawable::createFromSVG(*arrow_btn_data);
     
-    prevButton.setImages(prev_btn_path.get());
+    auto arrow_hover_btn_data = juce::XmlDocument::parse(BinaryData::arrow_hover_svg);
+    auto arrow_hover_btn_path = juce::Drawable::createFromSVG(*arrow_hover_btn_data);
+    
+    auto arrow_dis_btn_data = juce::XmlDocument::parse(BinaryData::arrow_disabled_svg);
+    auto arrow_dis_btn_path = juce::Drawable::createFromSVG(*arrow_dis_btn_data);
+    
+    prevButton.setImages(arrow_btn_path.get(),
+                         arrow_hover_btn_path.get(),
+                         nullptr,
+                         arrow_dis_btn_path.get());
+    prevButton.setEnabled(false);
     
     prevButton.onClick = [this] { loadPrevFile(); };
     
     addAndMakeVisible(prevButton);
     
-    // next arrow
-    auto next_btn_data = juce::XmlDocument::parse(BinaryData::arrow_svg);
-    auto next_btn_path = juce::Drawable::createFromSVG(*next_btn_data);
-    
-    nextButton.setImages(next_btn_path.get());
+    nextButton.setImages(arrow_btn_path.get(),
+                         arrow_hover_btn_path.get(),
+                         nullptr,
+                         arrow_dis_btn_path.get());
+    nextButton.setEnabled(false);
     
     // rotation values
     // x-rot: x + (0.5f*width)
@@ -97,7 +126,11 @@ EditorContent::EditorContent(MidiPlayerAudioProcessor* inProcessor)
     auto close_btn_data = juce::XmlDocument::parse(BinaryData::close_svg);
     auto close_btn_path = juce::Drawable::createFromSVG(*close_btn_data);
     
-    closeButton.setImages(close_btn_path.get());
+    auto close_hover_btn_data = juce::XmlDocument::parse(BinaryData::close_hover_svg);
+    auto close_hover_btn_path = juce::Drawable::createFromSVG(*close_hover_btn_data);
+    
+    closeButton.setImages(close_btn_path.get(),
+                          close_hover_btn_path.get());
     
     closeButton.onClick = [this] { hideOverlay(); };
     
@@ -107,7 +140,11 @@ EditorContent::EditorContent(MidiPlayerAudioProcessor* inProcessor)
     auto link_btn_data = juce::XmlDocument::parse(BinaryData::link_svg);
     auto link_btn_path = juce::Drawable::createFromSVG(*link_btn_data);
     
-    linkButton.setImages(link_btn_path.get());
+    auto link_hover_btn_data = juce::XmlDocument::parse(BinaryData::link_hover_svg);
+    auto link_hover_btn_path = juce::Drawable::createFromSVG(*link_hover_btn_data);
+    
+    linkButton.setImages(link_btn_path.get(),
+                         link_hover_btn_path.get());
     
     linkButton.onClick = [] {
         if (!juce::URL(JucePlugin_ManufacturerWebsite).launchInDefaultBrowser()) {
@@ -180,6 +217,9 @@ void EditorContent::loadFiles()
         
         fileLabel.setText(midiFiles.getReference(fileIndex).getFileNameWithoutExtension(), juce::sendNotification);
         processor->loadMIDIFile(midiFiles.getReference(fileIndex));
+        
+        prevButton.setEnabled(true);
+        nextButton.setEnabled(true);
     });
 }
 
