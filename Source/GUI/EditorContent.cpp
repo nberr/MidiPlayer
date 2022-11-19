@@ -108,7 +108,7 @@ EditorContent::EditorContent(MidiPlayerAudioProcessor* inProcessor)
                                                               "*.mid");
     
     // file display
-    fileLabel.setColour(juce::Label::ColourIds::textColourId, juce::Colour(103, 201, 203));
+    fileLabel.setColour(juce::Label::ColourIds::textColourId, juce::Colour(252, 246, 209));
     
     auto font = juce::Typeface::createSystemTypefaceFor(BinaryData::InterRegular_otf, BinaryData::InterRegular_otfSize);
     fileLabel.setFont(juce::Font(font).withHeight(12));

@@ -7,38 +7,38 @@
   <MAINGROUP id="QHCWTA" name="MidiPlayer">
     <GROUP id="{F1FF27FF-CD62-7951-4DC7-2F56AC927368}" name="Assets">
       <GROUP id="{5D0FCEE9-D4EA-167C-5941-C98D7708574B}" name="Fonts">
-        <FILE id="y6VeWS" name="Inter-Regular.otf" compile="0" resource="1"
+        <FILE id="eBZ4yZ" name="Inter-Regular.otf" compile="0" resource="1"
               file="Assets/Fonts/Inter-Regular.otf"/>
       </GROUP>
       <GROUP id="{FB439F49-3C3E-D540-1076-54C2D4A24A94}" name="Main">
         <GROUP id="{7E9FABFB-2687-55C1-9AF6-9330F83CB843}" name="arrow">
-          <FILE id="phum2r" name="arrow.svg" compile="0" resource="1" file="Assets/Main/arrow/arrow.svg"/>
-          <FILE id="iu2Flm" name="arrow_disabled.svg" compile="0" resource="1"
+          <FILE id="Xu8sQo" name="arrow.svg" compile="0" resource="1" file="Assets/Main/arrow/arrow.svg"/>
+          <FILE id="nHvrTL" name="arrow_disabled.svg" compile="0" resource="1"
                 file="Assets/Main/arrow/arrow_disabled.svg"/>
-          <FILE id="IT9HQc" name="arrow_hover.svg" compile="0" resource="1" file="Assets/Main/arrow/arrow_hover.svg"/>
+          <FILE id="jGmmNI" name="arrow_hover.svg" compile="0" resource="1" file="Assets/Main/arrow/arrow_hover.svg"/>
         </GROUP>
         <GROUP id="{433B839A-8D31-0824-0EDF-72CFFA2919F4}" name="folder">
-          <FILE id="a6iYCF" name="folder.svg" compile="0" resource="1" file="Assets/Main/folder/folder.svg"/>
-          <FILE id="VhWrS1" name="folder_hover.svg" compile="0" resource="1"
+          <FILE id="eH0uZa" name="folder.svg" compile="0" resource="1" file="Assets/Main/folder/folder.svg"/>
+          <FILE id="RDo1eN" name="folder_hover.svg" compile="0" resource="1"
                 file="Assets/Main/folder/folder_hover.svg"/>
         </GROUP>
         <GROUP id="{AFCD511B-5021-CDEA-BB16-408A6449D7C9}" name="hamburger">
-          <FILE id="xsiJo1" name="hamburger.svg" compile="0" resource="1" file="Assets/Main/hamburger/hamburger.svg"/>
-          <FILE id="EzpDVS" name="hamburger_hover.svg" compile="0" resource="1"
+          <FILE id="unmMtC" name="hamburger.svg" compile="0" resource="1" file="Assets/Main/hamburger/hamburger.svg"/>
+          <FILE id="neJvuq" name="hamburger_hover.svg" compile="0" resource="1"
                 file="Assets/Main/hamburger/hamburger_hover.svg"/>
         </GROUP>
-        <FILE id="cmcWlf" name="backplate.svg" compile="0" resource="1" file="Assets/Main/backplate.svg"/>
+        <FILE id="NZqcct" name="backplate.svg" compile="0" resource="1" file="Assets/Main/backplate.svg"/>
       </GROUP>
       <GROUP id="{2FD73A6B-5EFE-309A-E6D3-8D5A7F1B7E71}" name="Overlay">
         <GROUP id="{76535521-9031-82CE-AA2E-F581697C7128}" name="close">
-          <FILE id="E6HGNW" name="close.svg" compile="0" resource="1" file="Assets/Overlay/close/close.svg"/>
-          <FILE id="ClqVsP" name="close_hover.svg" compile="0" resource="1" file="Assets/Overlay/close/close_hover.svg"/>
+          <FILE id="xTs6g6" name="close.svg" compile="0" resource="1" file="Assets/Overlay/close/close.svg"/>
+          <FILE id="IYgKu3" name="close_hover.svg" compile="0" resource="1" file="Assets/Overlay/close/close_hover.svg"/>
         </GROUP>
         <GROUP id="{44780908-D4D0-B0DF-E249-12378CC83EF2}" name="link">
-          <FILE id="uUlSB9" name="link.svg" compile="0" resource="1" file="Assets/Overlay/link/link.svg"/>
-          <FILE id="xCJd0D" name="link_hover.svg" compile="0" resource="1" file="Assets/Overlay/link/link_hover.svg"/>
+          <FILE id="m2ZY9v" name="link.svg" compile="0" resource="1" file="Assets/Overlay/link/link.svg"/>
+          <FILE id="jzKoPl" name="link_hover.svg" compile="0" resource="1" file="Assets/Overlay/link/link_hover.svg"/>
         </GROUP>
-        <FILE id="l1HNd1" name="overlay_backplate.svg" compile="0" resource="1"
+        <FILE id="P1nbzA" name="overlay_backplate.svg" compile="0" resource="1"
               file="Assets/Overlay/overlay_backplate.svg"/>
       </GROUP>
     </GROUP>
