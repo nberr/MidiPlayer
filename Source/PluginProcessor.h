@@ -53,13 +53,17 @@ public:
     
 private:
     //==============================================================================
-    juce::Array<bool> noteHistory;
+    juce::Array<bool> midiIn;
+    juce::Array<bool> midiOut;
     
     //==============================================================================
     juce::CriticalSection processLock;
     juce::MidiFile loadedFile;
     
     juce::MidiBuffer fileBuffer;
+    
+    juce::Array<juce::MidiBuffer> splitFile;
+    int bufferIndex = -1;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiPlayerAudioProcessor)

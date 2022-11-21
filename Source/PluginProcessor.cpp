@@ -90,8 +90,12 @@ void MidiPlayerAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
     // initialisation that you need..
     juce::ignoreUnused(sampleRate, samplesPerBlock);
     
-    for (auto& note : noteHistory) {
-        note = false;
+    midiIn.resize(127);
+    midiOut.resize(127);
+    
+    for (int n = 0; n < 127; ++n) {
+        midiIn.getReference(n) = false;
+        midiOut.getReference(n) = false;
     }
 }
 
@@ -103,7 +107,6 @@ void MidiPlayerAudioProcessor::releaseResources()
 
 void MidiPlayerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    /* not interested in audio data */
     juce::ignoreUnused(buffer);
     
     for (auto metadata : midiMessages) {
@@ -112,30 +115,48 @@ void MidiPlayerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
         auto msg = metadata.getMessage();
         int note = msg.getNoteNumber();
 
-        
         /* only interested in on and off messages */
         if (msg.isNoteOn()) {
             
-            /* start sequence only if this is the first note on */
-            if (!noteHistory.contains(true)) {
-                /* sequence isn't currently playing so we need to start it */
+            if (!midiIn.contains(true)) {
+                bufferIndex = 0;
             }
             
             /* turn the note on */
-            noteHistory.getReference(note) = true;
+            midiIn.getReference(note) = true;
         }
         else if (msg.isNoteOff()) {
            
             /* turn the note off */
-            noteHistory.getReference(note) = false;
+            midiIn.getReference(note) = false;
             
-            /* end sequence only if all notes are off */
-            if (!noteHistory.contains(true)) {
-                
-                /* all notes are off. stop the sequence */
-                
+        }
+    }
+    
+    /* no notes are being held down by the user. exit early */
+    if (!midiIn.contains(true)) {
+        
+        /* clear any notes that are still on */
+        if (midiOut.contains(true)) {
+            for (int n = 0; n < 127; ++n) {
+                if (midiOut.getReference(n)) {
+                    midiMessages.addEvent(juce::MidiMessage::noteOff(0, n, 1.f), 0);
+                }
             }
         }
+        
+        return;
+    }
+    
+    midiMessages.clear();
+    
+    /* sequence should play */
+    juce::MidiBuffer block_ref = splitFile.getReference(bufferIndex);
+    midiMessages.swapWith(block_ref);
+    
+    bufferIndex++;
+    if (bufferIndex >= splitFile.size()) {
+        bufferIndex = 0;
     }
 }
 
@@ -176,19 +197,76 @@ void MidiPlayerAudioProcessor::loadMIDIFile(juce::File f)
     
     juce::FileInputStream s(f);
     loadedFile.readFrom(s);
-
-    auto seq = *loadedFile.getTrack(0);
     
-    for (auto metadata : seq) {
-        auto msg = metadata->message;
+    /** This function call means that the MIDI file is going to be played with the
+        original tempo and signature.
+
+        To play it at the host tempo, we might need to do it manually in processBlock
+        and retrieve all the time the current tempo to track tempo changes.
+    */
+    //loadedFile.convertTimestampTicksToSeconds();
+
+    /* for each track */
+    /* NOTE: all MIDI tracks get squashed down into a single track */
+    for (int t = 0; t < loadedFile.getNumTracks(); ++t) {
+
+        auto seq = *loadedFile.getTrack(t);
         
-        if (msg.isNoteOn()) {
-            fileBuffer.addEvent(msg, static_cast<int>(msg.getTimeStamp()));
-        }
-        else if (msg.isNoteOff()) {
-            fileBuffer.addEvent(msg, static_cast<int>(msg.getTimeStamp()));
+        for (auto metadata : seq) {
+            auto msg = metadata->message;
+            
+            if (msg.isNoteOn()) {
+                fileBuffer.addEvent(msg, static_cast<int>(msg.getTimeStamp()));
+            }
+            else if (msg.isNoteOff()) {
+                fileBuffer.addEvent(msg, static_cast<int>(msg.getTimeStamp()));
+            }
         }
     }
+    
+    splitFile.clear();
+    
+    int block = 0;
+    splitFile.add(juce::MidiBuffer());
+    
+    DBG("first: " << fileBuffer.getFirstEventTime());
+    /* add blank blocks */
+    while ((block+1) * getBlockSize() < fileBuffer.getFirstEventTime()) {
+        splitFile.add(juce::MidiBuffer());
+        block++;
+    }
+    
+    DBG("blank blocks: " << block);
+    
+    for (auto metadata : fileBuffer) {
+        
+        auto msg = metadata.getMessage();
+        
+        if (msg.isNoteOnOrOff()) {
+            
+            auto time_in_block = msg.getTimeStamp() - (block*getBlockSize());
+            
+            if (msg.getTimeStamp() < ((block+1) * getBlockSize())) {
+                splitFile.getReference(block).addEvent(msg, static_cast<int>(time_in_block));
+            }
+            else {
+                splitFile.add(juce::MidiBuffer());
+                block++;
+                
+                time_in_block = msg.getTimeStamp() - (block*getBlockSize());
+                
+                splitFile.getReference(block).addEvent(msg, static_cast<int>(time_in_block));
+            }
+            
+            DBG("note " << msg.getNoteNumber() << " at raw " << msg.getTimeStamp());
+            DBG("note " << msg.getNoteNumber() << " at " << time_in_block);
+        }
+    }
+    
+    DBG("final: " << fileBuffer.getLastEventTime());
+    DBG("block: " << getBlockSize());
+    DBG("expected blocks: " << fileBuffer.getLastEventTime() / getBlockSize());
+    DBG("total blocks: " << block);
 }
 
 //==============================================================================
