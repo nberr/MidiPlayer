@@ -21,7 +21,12 @@ static constexpr int max_width = 1050;
 static constexpr int max_height = 675;
 
 //==============================================================================
-class MidiPlayerAudioProcessorEditor  : public juce::AudioProcessorEditor
+class MidiPlayerAudioProcessorEditor
+:
+#ifdef JUCE_DEBUG
+    private juce::Timer,
+#endif
+    public juce::AudioProcessorEditor
 {
 public:
     MidiPlayerAudioProcessorEditor (MidiPlayerAudioProcessor&);
@@ -35,6 +40,14 @@ private:
     
     EditorContent content;
 
+#ifdef JUCE_DEBUG
+    //==============================================================================
+    void timerCallback() override;
+    
+    juce::DocumentWindow debugWindow {"Debug", juce::Colours::white, 0};
+    juce::TextEditor debugDisplay;
+#endif
+    
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiPlayerAudioProcessorEditor)
 };

@@ -35,6 +35,25 @@ MidiPlayerAudioProcessorEditor::MidiPlayerAudioProcessorEditor(MidiPlayerAudioPr
     /* set the default size */
     setSize (min_width, min_height);
     content.setBounds(0, 0, getWidth(), getHeight());
+    
+#ifdef JUCE_DEBUG
+    
+    // log messages every one second
+    startTimer(1);
+    
+    debugWindow.setBounds(0, 0, 300, 200);
+    debugWindow.setUsingNativeTitleBar(true);
+    debugWindow.setVisible(true);
+    
+    debugDisplay.setMultiLine (true);
+    debugDisplay.setReturnKeyStartsNewLine (true);
+    debugDisplay.setReadOnly (true);
+    debugDisplay.setScrollbarsShown (true);
+    debugDisplay.setCaretVisible (false);
+    debugDisplay.setBounds(debugWindow.getLocalBounds());
+    debugWindow.Component::addAndMakeVisible(debugDisplay);
+    
+#endif
 }
 
 void MidiPlayerAudioProcessorEditor::resized()
@@ -43,3 +62,21 @@ void MidiPlayerAudioProcessorEditor::resized()
     float factor = static_cast<float>(getHeight()) / static_cast<float>(min_height);
     content.setTransform(juce::AffineTransform::scale(factor));
 }
+
+#ifdef JUCE_DEBUG
+//==============================================================================
+void MidiPlayerAudioProcessorEditor::timerCallback()
+{
+    /* make a copy of the messages */
+    juce::StringArray messages = audioProcessor.debugMessages;
+    
+    /* clear messages */
+    audioProcessor.debugMessages.clear();
+    
+    /* print the messages */
+    for (auto msg : messages) {
+        debugDisplay.moveCaretToEnd();
+        debugDisplay.insertTextAtCaret (msg + juce::newLine);
+    }
+}
+#endif
