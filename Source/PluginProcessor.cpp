@@ -204,7 +204,7 @@ void MidiPlayerAudioProcessor::loadMIDIFile(juce::File f)
         To play it at the host tempo, we might need to do it manually in processBlock
         and retrieve all the time the current tempo to track tempo changes.
     */
-    //loadedFile.convertTimestampTicksToSeconds();
+    loadedFile.convertTimestampTicksToSeconds();
 
     /* for each track */
     /* NOTE: all MIDI tracks get squashed down into a single track */
@@ -216,10 +216,12 @@ void MidiPlayerAudioProcessor::loadMIDIFile(juce::File f)
             auto msg = metadata->message;
             
             if (msg.isNoteOn()) {
-                fileBuffer.addEvent(msg, static_cast<int>(msg.getTimeStamp()));
+                DBG("note on: " << msg.getTimeStamp());
+                fileBuffer.addEvent(msg, static_cast<int>(msg.getTimeStamp() * getSampleRate()));
             }
             else if (msg.isNoteOff()) {
-                fileBuffer.addEvent(msg, static_cast<int>(msg.getTimeStamp()));
+                DBG("note off: " << msg.getTimeStamp());
+                fileBuffer.addEvent(msg, static_cast<int>(msg.getTimeStamp() * getSampleRate()));
             }
         }
     }
@@ -251,8 +253,11 @@ void MidiPlayerAudioProcessor::loadMIDIFile(juce::File f)
                 splitFile.getReference(block).addEvent(msg, static_cast<int>(time_in_block));
             }
             else {
-                splitFile.add(juce::MidiBuffer());
-                block++;
+                
+                while (msg.getTimeStamp() >= ((block+1) * getBlockSize())) {
+                    splitFile.add(juce::MidiBuffer());
+                    block++;
+                }
                 
                 time_in_block = msg.getTimeStamp() - (block*getBlockSize());
                 
@@ -267,6 +272,7 @@ void MidiPlayerAudioProcessor::loadMIDIFile(juce::File f)
     
     debugMessages.add("final: " + juce::String(fileBuffer.getLastEventTime()));
     debugMessages.add("block: " + juce::String(getBlockSize()));
+    debugMessages.add("sample rate: " + juce::String(getSampleRate()));
     debugMessages.add("expected blocks: " + juce::String(fileBuffer.getLastEventTime() / getBlockSize()));
     debugMessages.add("total blocks: " + juce::String(block));
 }
