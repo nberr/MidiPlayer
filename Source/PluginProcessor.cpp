@@ -229,14 +229,15 @@ void MidiPlayerAudioProcessor::loadMIDIFile(juce::File f)
     int block = 0;
     splitFile.add(juce::MidiBuffer());
     
-    DBG("first: " << fileBuffer.getFirstEventTime());
+    debugMessages.add("first: " + juce::String(fileBuffer.getFirstEventTime()));
+    
     /* add blank blocks */
     while ((block+1) * getBlockSize() < fileBuffer.getFirstEventTime()) {
         splitFile.add(juce::MidiBuffer());
         block++;
     }
     
-    DBG("blank blocks: " << block);
+    debugMessages.add("blank blocks: " + juce::String(block));
     
     for (auto metadata : fileBuffer) {
         
@@ -258,15 +259,16 @@ void MidiPlayerAudioProcessor::loadMIDIFile(juce::File f)
                 splitFile.getReference(block).addEvent(msg, static_cast<int>(time_in_block));
             }
             
-            DBG("note " << msg.getNoteNumber() << " at raw " << msg.getTimeStamp());
-            DBG("note " << msg.getNoteNumber() << " at " << time_in_block);
+            debugMessages.add("note: " + juce::String(msg.getNoteNumber()));
+            debugMessages.add("absolute: " + juce::String(msg.getTimeStamp()));
+            debugMessages.add("relative: " + juce::String(time_in_block));
         }
     }
     
-    DBG("final: " << fileBuffer.getLastEventTime());
-    DBG("block: " << getBlockSize());
-    DBG("expected blocks: " << fileBuffer.getLastEventTime() / getBlockSize());
-    DBG("total blocks: " << block);
+    debugMessages.add("final: " + juce::String(fileBuffer.getLastEventTime()));
+    debugMessages.add("block: " + juce::String(getBlockSize()));
+    debugMessages.add("expected blocks: " + juce::String(fileBuffer.getLastEventTime() / getBlockSize()));
+    debugMessages.add("total blocks: " + juce::String(block));
 }
 
 //==============================================================================

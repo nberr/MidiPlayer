@@ -56,7 +56,6 @@ public:
     juce::StringArray debugMessages;
 #endif
     
-    
 private:
     //==============================================================================
     juce::Array<bool> midiIn;
