@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="hVblPl" name="MidiPlayer" projectType="audioplug" useAppConfig="0"
+<JUCERPROJECT id="hVblPl" name="SPITE MIDI" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
               version="1.0.0" companyName="SPITE" pluginCharacteristicsValue="pluginIsMidiEffectPlugin,pluginProducesMidiOut,pluginWantsMidiIn"
-              cppLanguageStandard="latest" companyWebsite="https://store.spiteaudiotools.com/">
-  <MAINGROUP id="QHCWTA" name="MidiPlayer">
+              cppLanguageStandard="latest" companyWebsite="https://store.spiteaudiotools.com/"
+              pluginName="SPITE MIDI" pluginManufacturerCode="Spte" pluginCode="Smid">
+  <MAINGROUP id="QHCWTA" name="SPITE MIDI">
     <GROUP id="{F1FF27FF-CD62-7951-4DC7-2F56AC927368}" name="Assets">
       <GROUP id="{5D0FCEE9-D4EA-167C-5941-C98D7708574B}" name="Fonts">
         <FILE id="FDNNau" name="Inter-Regular.otf" compile="0" resource="1"
@@ -61,9 +62,9 @@
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" targetName="MidiPlayer" recommendedWarnings="LLVM"
+        <CONFIGURATION isDebug="1" name="Debug" targetName="SPITE MIDI" recommendedWarnings="LLVM"
                        macOSDeploymentTarget="10.13" osxCompatibility="10.13 SDK"/>
-        <CONFIGURATION isDebug="0" name="Release" targetName="MidiPlayer" macOSDeploymentTarget="10.13"
+        <CONFIGURATION isDebug="0" name="Release" targetName="SPITE MIDI" macOSDeploymentTarget="10.13"
                        osxCompatibility="10.13 SDK"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
