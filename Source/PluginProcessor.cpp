@@ -216,11 +216,9 @@ void MidiPlayerAudioProcessor::loadMIDIFile(juce::File f)
             auto msg = metadata->message;
             
             if (msg.isNoteOn()) {
-                DBG("note on: " << msg.getTimeStamp());
                 fileBuffer.addEvent(msg, static_cast<int>(msg.getTimeStamp() * getSampleRate()));
             }
             else if (msg.isNoteOff()) {
-                DBG("note off: " << msg.getTimeStamp());
                 fileBuffer.addEvent(msg, static_cast<int>(msg.getTimeStamp() * getSampleRate()));
             }
         }
