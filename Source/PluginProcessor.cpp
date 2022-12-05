@@ -109,6 +109,8 @@ void MidiPlayerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
 {
     juce::ignoreUnused(buffer);
     
+    bpm = *getPlayHead()->getPosition()->getBpm();
+    
     for (auto metadata : midiMessages) {
         
         /* get the message and note number */
@@ -205,6 +207,10 @@ void MidiPlayerAudioProcessor::loadMIDIFile(juce::File f)
         and retrieve all the time the current tempo to track tempo changes.
     */
     loadedFile.convertTimestampTicksToSeconds();
+    
+#if JUCE_DEBUG
+    debugMessages.add("bpm: " + juce::String(bpm));
+#endif
 
     /* for each track */
     /* NOTE: all MIDI tracks get squashed down into a single track */
@@ -215,11 +221,17 @@ void MidiPlayerAudioProcessor::loadMIDIFile(juce::File f)
         for (auto metadata : seq) {
             auto msg = metadata->message;
             
+            if (bpm == 0) {
+                bpm = 1;
+            }
+            
+            double new_time = msg.getTimeStamp() * (60.0 / bpm);
+            
             if (msg.isNoteOn()) {
-                fileBuffer.addEvent(msg, static_cast<int>(msg.getTimeStamp() * getSampleRate()));
+                fileBuffer.addEvent(msg, static_cast<int>(new_time * getSampleRate()));
             }
             else if (msg.isNoteOff()) {
-                fileBuffer.addEvent(msg, static_cast<int>(msg.getTimeStamp() * getSampleRate()));
+                fileBuffer.addEvent(msg, static_cast<int>(new_time * getSampleRate()));
             }
         }
     }

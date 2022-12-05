@@ -61,6 +61,8 @@ private:
     juce::Array<bool> midiIn;
     juce::Array<bool> midiOut;
     
+    double bpm = -1;
+    
     //==============================================================================
     juce::CriticalSection processLock;
     juce::MidiFile loadedFile;
