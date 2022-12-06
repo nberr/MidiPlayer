@@ -108,8 +108,22 @@ void MidiPlayerAudioProcessor::releaseResources()
 void MidiPlayerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     juce::ignoreUnused(buffer);
-    
-    bpm = *getPlayHead()->getPosition()->getBpm();
+
+    /* we don't really care about checking in release because we're only support AU/VST3 */
+#ifdef JUCE_DEBUG
+    /* if the plugin host is standalone, BPM info is missing so don't do this part */
+    if (juce::PluginHostType().getPluginLoadedAs() != juce::AudioProcessor::WrapperType::wrapperType_Standalone) {
+#endif
+      
+    /* NORMAL PROCESSING STARTS HERE */
+        
+    double curr_bpm = *getPlayHead()->getPosition()->getBpm();
+    if (bpm != curr_bpm) {
+        
+        debugMessages.add("bpm changed from " + juce::String(bpm) + " to " + juce::String(curr_bpm));
+        
+        bpm = curr_bpm;
+    }
     
     for (auto metadata : midiMessages) {
         
@@ -160,6 +174,10 @@ void MidiPlayerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     if (bufferIndex >= splitFile.size()) {
         bufferIndex = 0;
     }
+        
+#ifdef JUCE_DEBUG
+    }
+#endif
 }
 
 //==============================================================================
@@ -207,10 +225,6 @@ void MidiPlayerAudioProcessor::loadMIDIFile(juce::File f)
         and retrieve all the time the current tempo to track tempo changes.
     */
     loadedFile.convertTimestampTicksToSeconds();
-    
-#if JUCE_DEBUG
-    debugMessages.add("bpm: " + juce::String(bpm));
-#endif
 
     /* for each track */
     /* NOTE: all MIDI tracks get squashed down into a single track */
