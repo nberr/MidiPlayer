@@ -169,6 +169,26 @@ void MidiPlayerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     /* sequence should play */
     juce::MidiBuffer block_ref = splitFile.getReference(bufferIndex);
     midiMessages.swapWith(block_ref);
+        
+    for (auto metadata: midiMessages) {
+        
+        /* get the message and note number */
+        auto msg = metadata.getMessage();
+        auto note = msg.getNoteNumber();
+        
+        /* only interested in on and off messages */
+        if (msg.isNoteOn()) {
+            
+            /* turn the note on */
+            midiOut.getReference(note) = true;
+        }
+        else if (msg.isNoteOff()) {
+           
+            /* turn the note off */
+            midiOut.getReference(note) = false;
+            
+        }
+    }
     
     bufferIndex++;
     if (bufferIndex >= splitFile.size()) {
