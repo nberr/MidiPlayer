@@ -102,10 +102,53 @@ EditorContent::EditorContent(MidiPlayerAudioProcessor* inProcessor)
     
     addAndMakeVisible(nextButton);
     
+    juce::File path = juce::File::getSpecialLocation(juce::File::userMusicDirectory);
+    
     // file control
+    if (processor->state.hasProperty("Path")) {
+        
+        juce::File dir(processor->state.getProperty("Path"));
+        
+        if (dir.exists()) {
+            path = dir;
+            
+            /* get the midi file chosen */
+            auto midi_file = dir;
+            
+            if (!midi_file.exists()) {
+                return;
+            }
+            
+            /* search the rest of the directory for midi files */
+            juce::RangedDirectoryIterator it (midi_file.getParentDirectory(), false, "*.mid");
+            
+            /* clear the files */
+            midiFiles.clear();
+            fileIndex = -1;
+            
+            /* add all files to the array */
+            int index = 0;
+            for (auto f : it) {
+                midiFiles.add(f.getFile());
+                
+                if (f.getFile().getFileName() == midi_file.getFileName()) {
+                    fileIndex = index;
+                }
+                
+                ++index;
+            }
+            
+            fileLabel.setText(midiFiles.getReference(fileIndex).getFileNameWithoutExtension(), juce::sendNotification);
+            processor->loadMIDIFile(midiFiles.getReference(fileIndex));
+            
+            prevButton.setEnabled(true);
+            nextButton.setEnabled(true);
+        }
+    }
+    
     fileChooser = std::make_unique<juce::FileChooser>("Please select the MIDI file you want to load...",
-                                                              juce::File::getSpecialLocation(juce::File::userMusicDirectory),
-                                                              "*.mid");
+                                                       path,
+                                                       "*.mid");
     
     // file display
     fileLabel.setColour(juce::Label::ColourIds::textColourId, juce::Colour(252, 246, 209));
