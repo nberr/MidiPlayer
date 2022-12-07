@@ -90,6 +90,8 @@ void MidiPlayerAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
     // initialisation that you need..
     juce::ignoreUnused(sampleRate, samplesPerBlock);
     
+    fileBuffer.clear();
+    
     midiIn.resize(127);
     midiOut.resize(127);
     
@@ -165,6 +167,11 @@ void MidiPlayerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     }
     
     midiMessages.clear();
+        
+    /* a file hasn't been loaded so there's nothing to play */
+    if (fileBuffer.isEmpty()) {
+        return;
+    }
     
     /* sequence should play */
     juce::MidiBuffer block_ref = splitFile.getReference(bufferIndex);
