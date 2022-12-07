@@ -111,6 +111,38 @@ EditorContent::EditorContent(MidiPlayerAudioProcessor* inProcessor)
         
         if (dir.exists()) {
             path = dir;
+            
+            /* get the midi file chosen */
+            auto midi_file = dir;
+            
+            if (!midi_file.exists()) {
+                return;
+            }
+            
+            /* search the rest of the directory for midi files */
+            juce::RangedDirectoryIterator it (midi_file.getParentDirectory(), false, "*.mid");
+            
+            /* clear the files */
+            midiFiles.clear();
+            fileIndex = -1;
+            
+            /* add all files to the array */
+            int index = 0;
+            for (auto f : it) {
+                midiFiles.add(f.getFile());
+                
+                if (f.getFile().getFileName() == midi_file.getFileName()) {
+                    fileIndex = index;
+                }
+                
+                ++index;
+            }
+            
+            fileLabel.setText(midiFiles.getReference(fileIndex).getFileNameWithoutExtension(), juce::sendNotification);
+            processor->loadMIDIFile(midiFiles.getReference(fileIndex));
+            
+            prevButton.setEnabled(true);
+            nextButton.setEnabled(true);
         }
     }
     
