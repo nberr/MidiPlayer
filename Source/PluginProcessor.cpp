@@ -12,6 +12,7 @@
 //==============================================================================
 MidiPlayerAudioProcessor::MidiPlayerAudioProcessor()
 {
+    state = juce::ValueTree("State");
 }
 
 MidiPlayerAudioProcessor::~MidiPlayerAudioProcessor()
@@ -224,20 +225,57 @@ void MidiPlayerAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
-    juce::ignoreUnused(destData);
+    
+    DBG("saving state");
+    DBG(state.toXmlString());
+    
+    std::unique_ptr<juce::XmlElement> xml (state.createXml());
+    copyXmlToBinary (*xml, destData);
 }
 
 void MidiPlayerAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
-    juce::ignoreUnused(data, sizeInBytes);
+    
+    /* This function won't be called if the plugin has never been opened */
+        
+    DBG("loading state");
+    
+    std::unique_ptr<juce::XmlElement> state_xml (getXmlFromBinary (data, sizeInBytes));
+    
+    if (state_xml.get() == nullptr) {
+        return;
+    }
+    
+    state = juce::ValueTree::fromXml(*state_xml);
+    
+    if (state.hasProperty("Path")) {
+        /* try to load the directory */
+        
+        juce::String path = state.getProperty("Path");
+        
+        juce::File dir(path);
+        
+        if (!dir.exists()) {
+            DBG("directory doesn't exist anymore");
+            
+            return;
+        }
+       
+        /* directory still exists. try to load it */
+        DBG("directory still exists");
+    }
+    
+    DBG(state.toXmlString());
 }
 
 //==============================================================================
 void MidiPlayerAudioProcessor::loadMIDIFile(juce::File f)
 {
     const juce::ScopedLock myScopedLock(processLock);
+    
+    state.setProperty("Path", f.getFullPathName(), nullptr);
     
     fileBuffer.clear();
     loadedFile.clear();

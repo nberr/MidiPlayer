@@ -102,10 +102,21 @@ EditorContent::EditorContent(MidiPlayerAudioProcessor* inProcessor)
     
     addAndMakeVisible(nextButton);
     
+    juce::File path = juce::File::getSpecialLocation(juce::File::userMusicDirectory);
+    
     // file control
+    if (processor->state.hasProperty("Path")) {
+        
+        juce::File dir(processor->state.getProperty("Path"));
+        
+        if (dir.exists()) {
+            path = dir;
+        }
+    }
+    
     fileChooser = std::make_unique<juce::FileChooser>("Please select the MIDI file you want to load...",
-                                                              juce::File::getSpecialLocation(juce::File::userMusicDirectory),
-                                                              "*.mid");
+                                                       path,
+                                                       "*.mid");
     
     // file display
     fileLabel.setColour(juce::Label::ColourIds::textColourId, juce::Colour(252, 246, 209));
