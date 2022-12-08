@@ -50,6 +50,7 @@ public:
 
     //==============================================================================
     void loadMIDIFile(juce::File f);
+    void calculateForBPM();
     
 #ifdef JUCE_DEBUG
     //==============================================================================
@@ -68,18 +69,20 @@ private:
      * default bpm is 120 according to MIDI standard
      * https://majicdesigns.github.io/MD_MIDIFile/page_timing.html
      */
-    double bpm = 120;
+    double bpm = 120.0;
     
     int blockSize = -1;
     
+    int startSample = 0;
+    int endSample = 0;
+    int samplesPassed = 0;
+    
     //==============================================================================
     juce::CriticalSection processLock;
-    juce::MidiFile loadedFile;
     
-    juce::MidiBuffer fileBuffer;
-    
-    juce::Array<juce::MidiBuffer> splitFile;
-    int bufferIndex = -1;
+    juce::File file;
+    juce::MidiFile midiFile;
+    juce::MidiBuffer midiBuffer;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiPlayerAudioProcessor)
