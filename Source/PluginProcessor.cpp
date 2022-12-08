@@ -91,6 +91,8 @@ void MidiPlayerAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
     // initialisation that you need..
     juce::ignoreUnused(sampleRate, samplesPerBlock);
     
+    blockSize = samplesPerBlock;
+    
     fileBuffer.clear();
     
     midiIn.resize(127);
@@ -110,7 +112,9 @@ void MidiPlayerAudioProcessor::releaseResources()
 
 void MidiPlayerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    juce::ignoreUnused(buffer);
+    if (buffer.getNumSamples() != blockSize) {
+        /* need to recalculate values */
+    }
 
     /* we don't really care about checking in release because we're only support AU/VST3 */
 #ifdef JUCE_DEBUG
@@ -226,9 +230,6 @@ void MidiPlayerAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
     
-    DBG("saving state");
-    DBG(state.toXmlString());
-    
     std::unique_ptr<juce::XmlElement> xml (state.createXml());
     copyXmlToBinary (*xml, destData);
 }
@@ -239,8 +240,6 @@ void MidiPlayerAudioProcessor::setStateInformation (const void* data, int sizeIn
     // whose contents will have been created by the getStateInformation() call.
     
     /* This function won't be called if the plugin has never been opened */
-        
-    DBG("loading state");
     
     std::unique_ptr<juce::XmlElement> state_xml (getXmlFromBinary (data, sizeInBytes));
     
@@ -258,16 +257,13 @@ void MidiPlayerAudioProcessor::setStateInformation (const void* data, int sizeIn
         juce::File dir(path);
         
         if (!dir.exists()) {
-            DBG("directory doesn't exist anymore");
-            
+            /* file doesn't exist anymore */
             return;
         }
        
         /* directory still exists. try to load it */
-        DBG("directory still exists");
+        
     }
-    
-    DBG(state.toXmlString());
 }
 
 //==============================================================================
@@ -300,11 +296,7 @@ void MidiPlayerAudioProcessor::loadMIDIFile(juce::File f)
         for (auto metadata : seq) {
             auto msg = metadata->message;
             
-            if (bpm == 0) {
-                bpm = 1;
-            }
-            
-            double new_time = msg.getTimeStamp() * (60.0 / bpm);
+            double new_time = msg.getTimeStamp() * (bpm / 120.0);
             
             if (msg.isNoteOn()) {
                 fileBuffer.addEvent(msg, static_cast<int>(new_time * getSampleRate()));
@@ -325,7 +317,7 @@ void MidiPlayerAudioProcessor::loadMIDIFile(juce::File f)
 #endif
     
     /* add blank blocks */
-    while ((block+1) * getBlockSize() < fileBuffer.getFirstEventTime()) {
+    while ((block+1) * blockSize < fileBuffer.getFirstEventTime()) {
         splitFile.add(juce::MidiBuffer());
         block++;
     }
@@ -341,19 +333,19 @@ void MidiPlayerAudioProcessor::loadMIDIFile(juce::File f)
         
         if (msg.isNoteOnOrOff()) {
             
-            auto time_in_block = msg.getTimeStamp() - (block*getBlockSize());
+            auto time_in_block = msg.getTimeStamp() - (block*blockSize);
             
-            if (msg.getTimeStamp() < ((block+1) * getBlockSize())) {
+            if (msg.getTimeStamp() < ((block+1) * blockSize)) {
                 splitFile.getReference(block).addEvent(msg, static_cast<int>(time_in_block));
             }
             else {
                 
-                while (msg.getTimeStamp() >= ((block+1) * getBlockSize())) {
+                while (msg.getTimeStamp() >= ((block+1) * blockSize)) {
                     splitFile.add(juce::MidiBuffer());
                     block++;
                 }
                 
-                time_in_block = msg.getTimeStamp() - (block*getBlockSize());
+                time_in_block = msg.getTimeStamp() - (block*blockSize);
                 
                 splitFile.getReference(block).addEvent(msg, static_cast<int>(time_in_block));
             }
@@ -371,7 +363,7 @@ void MidiPlayerAudioProcessor::loadMIDIFile(juce::File f)
 #if JUCE_DEBUG
     
     debugMessages.add("final: " + juce::String(fileBuffer.getLastEventTime()));
-    debugMessages.add("block: " + juce::String(getBlockSize()));
+    debugMessages.add("block: " + juce::String(blockSize));
     debugMessages.add("sample rate: " + juce::String(getSampleRate()));
     debugMessages.add("expected blocks: " + juce::String(fileBuffer.getLastEventTime() / getBlockSize()));
     debugMessages.add("total blocks: " + juce::String(block));

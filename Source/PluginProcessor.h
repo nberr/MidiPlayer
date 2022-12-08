@@ -64,7 +64,13 @@ private:
     juce::Array<bool> midiIn;
     juce::Array<bool> midiOut;
     
-    double bpm = -1;
+    /*
+     * default bpm is 120 according to MIDI standard
+     * https://majicdesigns.github.io/MD_MIDIFile/page_timing.html
+     */
+    double bpm = 120;
+    
+    int blockSize = -1;
     
     //==============================================================================
     juce::CriticalSection processLock;
