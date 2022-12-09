@@ -164,24 +164,24 @@ void MidiPlayerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
             
         }
     }
-    
-    /* no notes are being held down by the user. exit early */
+       
+        
     if (!midiIn.contains(true)) {
         
-        /* clear any notes that are still on */
-        if (midiOut.contains(true)) {
+        /* no notes being held down */
+        /* need to skip the rest of the midi buffers */
+        
+        if (samplesPassed < endSample) {
+            midiMessages.clear();
             
-            for (int n = 0; n < 127; ++n) {
-                if (midiOut.getReference(n)) {
-                    debugMessages.add("Clearing note: " + juce::String(n));
-                    midiMessages.addEvent(juce::MidiMessage::noteOff(0, n, 1.f), 0);
-                }
-            }
+            midiMessages.addEvent(juce::MidiMessage::allNotesOff(0), 0);
+            
+            samplesPassed = endSample;
         }
         
         return;
     }
-        
+    
     if (samplesPassed > endSample) {
         
         startSample = 0;
@@ -204,6 +204,7 @@ void MidiPlayerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
             
             /* turn the note on */
             midiOut.getReference(note) = true;
+            
         }
         else if (msg.isNoteOff()) {
            
@@ -314,15 +315,18 @@ void MidiPlayerAudioProcessor::calculateForBPM()
         auto seq = *midiFile.getTrack(t);
         
         for (auto metadata : seq) {
+           
             auto msg = metadata->message;
+            auto note = msg.getNoteNumber();
+            auto velocity = msg.getFloatVelocity();
             
             double new_time = msg.getTimeStamp() * (120.0 / bpm);
             
             if (msg.isNoteOn()) {
-                midiBuffer.addEvent(msg, static_cast<int>(new_time * getSampleRate()));
+                midiBuffer.addEvent(juce::MidiMessage::noteOn(0, note, velocity), static_cast<int>(new_time * getSampleRate()));
             }
             else if (msg.isNoteOff()) {
-                midiBuffer.addEvent(msg, static_cast<int>(new_time * getSampleRate()));
+                midiBuffer.addEvent(juce::MidiMessage::noteOff(0, note, velocity), static_cast<int>(new_time * getSampleRate()));
             }
         }
     }
