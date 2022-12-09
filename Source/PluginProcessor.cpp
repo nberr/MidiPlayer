@@ -91,7 +91,9 @@ void MidiPlayerAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
     // initialisation that you need..
     juce::ignoreUnused(sampleRate, samplesPerBlock);
     
-    fileBuffer.clear();
+    blockSize = samplesPerBlock;
+    
+    midiBuffer.clear();
     
     midiIn.resize(127);
     midiOut.resize(127);
@@ -110,7 +112,9 @@ void MidiPlayerAudioProcessor::releaseResources()
 
 void MidiPlayerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    juce::ignoreUnused(buffer);
+    if (buffer.getNumSamples() != blockSize) {
+        /* need to recalculate values */
+    }
 
     /* we don't really care about checking in release because we're only support AU/VST3 */
 #ifdef JUCE_DEBUG
@@ -126,6 +130,8 @@ void MidiPlayerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
         debugMessages.add("bpm changed from " + juce::String(bpm) + " to " + juce::String(curr_bpm));
         
         bpm = curr_bpm;
+        
+        calculateForBPM();
     }
     
     for (auto metadata : midiMessages) {
@@ -138,7 +144,14 @@ void MidiPlayerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
         if (msg.isNoteOn()) {
             
             if (!midiIn.contains(true)) {
-                bufferIndex = 0;
+                
+                startSample = 0;
+                endSample = midiBuffer.getLastEventTime();
+                
+                auto data = midiBuffer;
+                midiMessages.swapWith(data);
+                
+                samplesPassed = 0;
             }
             
             /* turn the note on */
@@ -151,33 +164,35 @@ void MidiPlayerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
             
         }
     }
-    
-    /* no notes are being held down by the user. exit early */
+       
+        
     if (!midiIn.contains(true)) {
         
-        /* clear any notes that are still on */
-        if (midiOut.contains(true)) {
-            for (int n = 0; n < 127; ++n) {
-                if (midiOut.getReference(n)) {
-                    midiMessages.addEvent(juce::MidiMessage::noteOff(0, n, 1.f), 0);
-                }
-            }
+        /* no notes being held down */
+        /* need to skip the rest of the midi buffers */
+        
+        if (samplesPassed < endSample) {
+            midiMessages.clear();
+            
+            midiMessages.addEvent(juce::MidiMessage::allNotesOff(0), 0);
+            
+            samplesPassed = endSample;
         }
         
         return;
     }
     
-    midiMessages.clear();
+    if (samplesPassed > endSample) {
         
-    /* a file hasn't been loaded so there's nothing to play */
-    if (fileBuffer.isEmpty()) {
-        return;
+        startSample = 0;
+        endSample = midiBuffer.getLastEventTime();
+        
+        auto data = midiBuffer;
+        midiMessages.swapWith(data);
+        
+        samplesPassed = 0;
     }
     
-    /* sequence should play */
-    juce::MidiBuffer block_ref = splitFile.getReference(bufferIndex);
-    midiMessages.swapWith(block_ref);
-        
     for (auto metadata: midiMessages) {
         
         /* get the message and note number */
@@ -189,6 +204,7 @@ void MidiPlayerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
             
             /* turn the note on */
             midiOut.getReference(note) = true;
+            
         }
         else if (msg.isNoteOff()) {
            
@@ -198,11 +214,7 @@ void MidiPlayerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
         }
     }
     
-    bufferIndex++;
-    if (bufferIndex >= splitFile.size()) {
-        bufferIndex = 0;
-    }
-        
+    samplesPassed += buffer.getNumSamples();
 #ifdef JUCE_DEBUG
     }
 #endif
@@ -226,9 +238,6 @@ void MidiPlayerAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
     
-    DBG("saving state");
-    DBG(state.toXmlString());
-    
     std::unique_ptr<juce::XmlElement> xml (state.createXml());
     copyXmlToBinary (*xml, destData);
 }
@@ -239,8 +248,6 @@ void MidiPlayerAudioProcessor::setStateInformation (const void* data, int sizeIn
     // whose contents will have been created by the getStateInformation() call.
     
     /* This function won't be called if the plugin has never been opened */
-        
-    DBG("loading state");
     
     std::unique_ptr<juce::XmlElement> state_xml (getXmlFromBinary (data, sizeInBytes));
     
@@ -258,16 +265,13 @@ void MidiPlayerAudioProcessor::setStateInformation (const void* data, int sizeIn
         juce::File dir(path);
         
         if (!dir.exists()) {
-            DBG("directory doesn't exist anymore");
-            
+            /* file doesn't exist anymore */
             return;
         }
        
         /* directory still exists. try to load it */
-        DBG("directory still exists");
+        
     }
-    
-    DBG(state.toXmlString());
 }
 
 //==============================================================================
@@ -275,13 +279,18 @@ void MidiPlayerAudioProcessor::loadMIDIFile(juce::File f)
 {
     const juce::ScopedLock myScopedLock(processLock);
     
-    state.setProperty("Path", f.getFullPathName(), nullptr);
+    /* save the path to the file */
+    file = f;
     
-    fileBuffer.clear();
-    loadedFile.clear();
+    /* save the file path to the sate */
+    state.setProperty("Path", file.getFullPathName(), nullptr);
     
-    juce::FileInputStream s(f);
-    loadedFile.readFrom(s);
+    /* convert the file to a MIDI file */
+    juce::FileInputStream s(file);
+    
+    midiFile.clear();
+    midiFile.readFrom(s);
+    
     
     /** This function call means that the MIDI file is going to be played with the
         original tempo and signature.
@@ -289,94 +298,38 @@ void MidiPlayerAudioProcessor::loadMIDIFile(juce::File f)
         To play it at the host tempo, we might need to do it manually in processBlock
         and retrieve all the time the current tempo to track tempo changes.
     */
-    loadedFile.convertTimestampTicksToSeconds();
+    midiFile.convertTimestampTicksToSeconds();
+    
+    /* adjust time for BPM and sample rate */
+    calculateForBPM();
+}
 
+void MidiPlayerAudioProcessor::calculateForBPM()
+{
+    midiBuffer.clear();
+    
     /* for each track */
     /* NOTE: all MIDI tracks get squashed down into a single track */
-    for (int t = 0; t < loadedFile.getNumTracks(); ++t) {
+    for (int t = 0; t < midiFile.getNumTracks(); ++t) {
 
-        auto seq = *loadedFile.getTrack(t);
+        auto seq = *midiFile.getTrack(t);
         
         for (auto metadata : seq) {
+           
             auto msg = metadata->message;
+            auto note = msg.getNoteNumber();
+            auto velocity = msg.getFloatVelocity();
             
-            if (bpm == 0) {
-                bpm = 1;
-            }
-            
-            double new_time = msg.getTimeStamp() * (60.0 / bpm);
+            double new_time = msg.getTimeStamp() * (120.0 / bpm);
             
             if (msg.isNoteOn()) {
-                fileBuffer.addEvent(msg, static_cast<int>(new_time * getSampleRate()));
+                midiBuffer.addEvent(juce::MidiMessage::noteOn(0, note, velocity), static_cast<int>(new_time * getSampleRate()));
             }
             else if (msg.isNoteOff()) {
-                fileBuffer.addEvent(msg, static_cast<int>(new_time * getSampleRate()));
+                midiBuffer.addEvent(juce::MidiMessage::noteOff(0, note, velocity), static_cast<int>(new_time * getSampleRate()));
             }
         }
     }
-    
-    splitFile.clear();
-    
-    int block = 0;
-    splitFile.add(juce::MidiBuffer());
-    
-#if JUCE_DEBUG
-    debugMessages.add("first: " + juce::String(fileBuffer.getFirstEventTime()));
-#endif
-    
-    /* add blank blocks */
-    while ((block+1) * getBlockSize() < fileBuffer.getFirstEventTime()) {
-        splitFile.add(juce::MidiBuffer());
-        block++;
-    }
-    
-    
-#if JUCE_DEBUG
-    debugMessages.add("blank blocks: " + juce::String(block));
-#endif
-    
-    for (auto metadata : fileBuffer) {
-        
-        auto msg = metadata.getMessage();
-        
-        if (msg.isNoteOnOrOff()) {
-            
-            auto time_in_block = msg.getTimeStamp() - (block*getBlockSize());
-            
-            if (msg.getTimeStamp() < ((block+1) * getBlockSize())) {
-                splitFile.getReference(block).addEvent(msg, static_cast<int>(time_in_block));
-            }
-            else {
-                
-                while (msg.getTimeStamp() >= ((block+1) * getBlockSize())) {
-                    splitFile.add(juce::MidiBuffer());
-                    block++;
-                }
-                
-                time_in_block = msg.getTimeStamp() - (block*getBlockSize());
-                
-                splitFile.getReference(block).addEvent(msg, static_cast<int>(time_in_block));
-            }
-            
-#if JUCE_DEBUG
-            
-            debugMessages.add("note: " + juce::String(msg.getNoteNumber()));
-            debugMessages.add("absolute: " + juce::String(msg.getTimeStamp()));
-            debugMessages.add("relative: " + juce::String(time_in_block));
-            
-#endif
-        }
-    }
-    
-#if JUCE_DEBUG
-    
-    debugMessages.add("final: " + juce::String(fileBuffer.getLastEventTime()));
-    debugMessages.add("block: " + juce::String(getBlockSize()));
-    debugMessages.add("sample rate: " + juce::String(getSampleRate()));
-    debugMessages.add("expected blocks: " + juce::String(fileBuffer.getLastEventTime() / getBlockSize()));
-    debugMessages.add("total blocks: " + juce::String(block));
-    
-#endif
 }
 
 //==============================================================================
