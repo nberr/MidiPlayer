@@ -77,6 +77,8 @@ private:
     int endSample = 0;
     int samplesPassed = 0;
     
+    bool fileChanged = false;
+    
     //==============================================================================
     juce::CriticalSection processLock;
     

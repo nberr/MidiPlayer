@@ -171,7 +171,9 @@ void MidiPlayerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
         }
     }
        
-    if (!midiIn.contains(true)) {
+    if (!midiIn.contains(true) || fileChanged) {
+        
+        fileChanged = false;
         
         /* no notes being held down */
         /* need to skip the rest of the midi buffers */
@@ -282,6 +284,8 @@ void MidiPlayerAudioProcessor::setStateInformation (const void* data, int sizeIn
 void MidiPlayerAudioProcessor::loadMIDIFile(juce::File f)
 {
     const juce::ScopedLock myScopedLock(processLock);
+    
+    fileChanged = true;
     
     /* save the path to the file */
     file = f;
