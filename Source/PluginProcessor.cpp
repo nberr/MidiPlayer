@@ -285,8 +285,6 @@ void MidiPlayerAudioProcessor::loadMIDIFile(juce::File f)
 {
     const juce::ScopedLock myScopedLock(processLock);
     
-    fileChanged = true;
-    
     /* save the path to the file */
     file = f;
     
@@ -315,6 +313,8 @@ void MidiPlayerAudioProcessor::loadMIDIFile(juce::File f)
 void MidiPlayerAudioProcessor::calculateForBPM()
 {
     midiBuffer.clear();
+    
+    fileChanged = true;
     
     /* for each track */
     /* NOTE: all MIDI tracks get squashed down into a single track */
