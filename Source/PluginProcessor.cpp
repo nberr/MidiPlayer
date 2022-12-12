@@ -130,7 +130,14 @@ void MidiPlayerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
         calculateForBPM();
     }
     
-    for (auto metadata : midiMessages) {
+    /* why do we need a copy of the messages? */
+    /* copying the messages ensures that midiMessages only contains note on/off events */
+    /* if you want to support other events (like pitch bends or other things) you'll have
+       to add more if branches and add the messages manually */
+    auto midiCopy = midiMessages;
+    midiMessages.clear();
+        
+    for (auto metadata : midiCopy) {
         
         /* get the message and note number */
         auto msg = metadata.getMessage();
@@ -138,6 +145,8 @@ void MidiPlayerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
 
         /* only interested in on and off messages */
         if (msg.isNoteOn()) {
+            
+            midiMessages.addEvent(msg, static_cast<int>(msg.getTimeStamp()));
             
             if (!midiIn.contains(true)) {
                 
@@ -155,13 +164,13 @@ void MidiPlayerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
         }
         else if (msg.isNoteOff()) {
            
+            midiMessages.addEvent(msg, static_cast<int>(msg.getTimeStamp()));
+            
             /* turn the note off */
             midiIn.getReference(note) = false;
-            
         }
     }
        
-        
     if (!midiIn.contains(true)) {
         
         /* no notes being held down */
@@ -198,18 +207,14 @@ void MidiPlayerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
         /* only interested in on and off messages */
         if (msg.isNoteOn()) {
             
-            
-            debugMessages.add("note " + juce::String(note) + " on");
             /* turn the note on */
             midiOut.getReference(note) = true;
             
         }
         else if (msg.isNoteOff()) {
            
-            debugMessages.add("note " + juce::String(note) + " on");
             /* turn the note off */
             midiOut.getReference(note) = false;
-            
         }
     }
     
@@ -322,11 +327,9 @@ void MidiPlayerAudioProcessor::calculateForBPM()
             double new_time = msg.getTimeStamp() * (120.0 / bpm);
             
             if (msg.isNoteOn()) {
-                debugMessages.add("adding note " + juce::String(note) + " on");
                 midiBuffer.addEvent(juce::MidiMessage::noteOn(0, note, velocity), static_cast<int>(new_time * getSampleRate()));
             }
             else if (msg.isNoteOff()) {
-                debugMessages.add("adding note " + juce::String(note) + " off");
                 midiBuffer.addEvent(juce::MidiMessage::noteOff(0, note, velocity), static_cast<int>(new_time * getSampleRate()));
             }
         }
