@@ -112,10 +112,8 @@ void MidiPlayerAudioProcessor::releaseResources()
 
 void MidiPlayerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    if (buffer.getNumSamples() != blockSize) {
-        /* need to recalculate values */
-    }
-
+    buffer.clear();
+    
     /* we don't really care about checking in release because we're only support AU/VST3 */
 #ifdef JUCE_DEBUG
     /* if the plugin host is standalone, BPM info is missing so don't do this part */
@@ -126,8 +124,6 @@ void MidiPlayerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
         
     double curr_bpm = *getPlayHead()->getPosition()->getBpm();
     if (bpm != curr_bpm) {
-        
-        debugMessages.add("bpm changed from " + juce::String(bpm) + " to " + juce::String(curr_bpm));
         
         bpm = curr_bpm;
         
@@ -202,12 +198,15 @@ void MidiPlayerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
         /* only interested in on and off messages */
         if (msg.isNoteOn()) {
             
+            
+            debugMessages.add("note " + juce::String(note) + " on");
             /* turn the note on */
             midiOut.getReference(note) = true;
             
         }
         else if (msg.isNoteOff()) {
            
+            debugMessages.add("note " + juce::String(note) + " on");
             /* turn the note off */
             midiOut.getReference(note) = false;
             
@@ -323,9 +322,11 @@ void MidiPlayerAudioProcessor::calculateForBPM()
             double new_time = msg.getTimeStamp() * (120.0 / bpm);
             
             if (msg.isNoteOn()) {
+                debugMessages.add("adding note " + juce::String(note) + " on");
                 midiBuffer.addEvent(juce::MidiMessage::noteOn(0, note, velocity), static_cast<int>(new_time * getSampleRate()));
             }
             else if (msg.isNoteOff()) {
+                debugMessages.add("adding note " + juce::String(note) + " off");
                 midiBuffer.addEvent(juce::MidiMessage::noteOff(0, note, velocity), static_cast<int>(new_time * getSampleRate()));
             }
         }

@@ -227,6 +227,21 @@ void EditorContent::loadFiles()
 {
     jassert(fileChooser != nullptr);
     
+    juce::File path = juce::File::getSpecialLocation(juce::File::userMusicDirectory);
+    
+    if (processor->state.hasProperty("Path")) {
+        
+        juce::File dir(processor->state.getProperty("Path"));
+        
+        if (dir.exists()) {
+            path = dir;
+        }
+    }
+    
+    fileChooser = std::make_unique<juce::FileChooser>("Please select the MIDI file you want to load...",
+                                                       path,
+                                                       "*.mid");
+    
     auto folderChooserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles;
     
     /* open the file browser */
