@@ -11,7 +11,7 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 
-#include "GUI/EditorContent.h"
+#include "GUI/Content/EditorContent.h"
 
 //==============================================================================
 static constexpr int min_width = 350;

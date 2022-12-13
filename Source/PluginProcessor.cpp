@@ -331,10 +331,10 @@ void MidiPlayerAudioProcessor::calculateForBPM()
             double new_time = msg.getTimeStamp() * (120.0 / bpm);
             
             if (msg.isNoteOn()) {
-                midiBuffer.addEvent(juce::MidiMessage::noteOn(0, note, velocity), static_cast<int>(new_time * getSampleRate()));
+                midiBuffer.addEvent(juce::MidiMessage::noteOn(1, note, velocity), static_cast<int>(new_time * getSampleRate()));
             }
             else if (msg.isNoteOff()) {
-                midiBuffer.addEvent(juce::MidiMessage::noteOff(0, note, velocity), static_cast<int>(new_time * getSampleRate()));
+                midiBuffer.addEvent(juce::MidiMessage::noteOff(1, note, velocity), static_cast<int>(new_time * getSampleRate()));
             }
         }
     }

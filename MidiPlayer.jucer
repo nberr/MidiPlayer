@@ -45,9 +45,11 @@
     </GROUP>
     <GROUP id="{9C6729F6-2090-5AF8-4D54-016C0BC68488}" name="Source">
       <GROUP id="{79548204-9B11-9561-7468-716ABB24ED1D}" name="GUI">
-        <FILE id="eyYn79" name="EditorContent.cpp" compile="1" resource="0"
-              file="Source/GUI/EditorContent.cpp"/>
-        <FILE id="SQVFLl" name="EditorContent.h" compile="0" resource="0" file="Source/GUI/EditorContent.h"/>
+        <GROUP id="{F92D0B6E-2555-0628-772D-9A9014C2EBB4}" name="Content">
+          <FILE id="srjw6f" name="EditorContent.cpp" compile="1" resource="0"
+                file="Source/GUI/Content/EditorContent.cpp"/>
+          <FILE id="k5s8RX" name="EditorContent.h" compile="0" resource="0" file="Source/GUI/Content/EditorContent.h"/>
+        </GROUP>
       </GROUP>
       <FILE id="s7Lb66" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
