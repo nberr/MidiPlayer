@@ -328,7 +328,7 @@ void MidiPlayerAudioProcessor::calculateForBPM()
             auto note = msg.getNoteNumber();
             auto velocity = msg.getFloatVelocity();
             
-            double new_time = msg.getTimeStamp() * (120.0 / bpm);
+            double new_time = (msg.getTimeStamp()-seq.getStartTime()) * (120.0 / bpm);
             
             if (msg.isNoteOn()) {
                 midiBuffer.addEvent(juce::MidiMessage::noteOn(1, note, velocity), static_cast<int>(new_time * getSampleRate()));
