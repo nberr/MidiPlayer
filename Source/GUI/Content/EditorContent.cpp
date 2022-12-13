@@ -262,16 +262,11 @@ void EditorContent::loadFiles()
         fileIndex = -1;
         
         /* add all files to the array */
-        int index = 0;
         for (auto f : it) {
-            midiFiles.add(f.getFile());
-            
-            if (f.getFile().getFileName() == midi_file.getFileName()) {
-                fileIndex = index;
-            }
-            
-            ++index;
+            midiFiles.addUsingDefaultSort(f.getFile());
         }
+        
+        fileIndex = midiFiles.indexOf(midi_file);
         
         fileLabel.setText(midiFiles.getReference(fileIndex).getFileNameWithoutExtension(), juce::sendNotification);
         processor->loadMIDIFile(midiFiles.getReference(fileIndex));
