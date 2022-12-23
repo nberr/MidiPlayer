@@ -158,6 +158,10 @@ void MidiPlayerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
                 
                 samplesPassed = 0;
             }
+            else {
+                /* clear the current buffer */
+                fileChanged = true;
+            }
             
             /* turn the note on */
             midiIn.getReference(note) = true;
