@@ -320,11 +320,27 @@ void MidiPlayerAudioProcessor::calculateForBPM()
     
     fileChanged = true;
     
+    bool reversed = false;
+    
     /* for each track */
     /* NOTE: all MIDI tracks get squashed down into a single track */
     for (int t = 0; t < midiFile.getNumTracks(); ++t) {
 
         auto seq = *midiFile.getTrack(t);
+        
+        double first_event = 0.0;
+        double last_event = 0.0;
+        bool first = true;
+        for (auto metadata : seq) {
+            if (metadata->message.isNoteOnOrOff()) {
+                last_event = metadata->message.getTimeStamp();
+                
+                if (first) {
+                    first_event = metadata->message.getTimeStamp();
+                    first = false;
+                }
+            }
+        }
         
         for (auto metadata : seq) {
            
@@ -332,13 +348,25 @@ void MidiPlayerAudioProcessor::calculateForBPM()
             auto note = msg.getNoteNumber();
             auto velocity = msg.getFloatVelocity();
             
-            double new_time = (msg.getTimeStamp()-seq.getStartTime()) * (120.0 / bpm);
+            double norm_time = (msg.getTimeStamp()-first_event) * (120.0 / bpm);
+            double reverse_time = (last_event - msg.getTimeStamp()) * (120.0 / bpm);
             
             if (msg.isNoteOn()) {
-                midiBuffer.addEvent(juce::MidiMessage::noteOn(1, note, velocity), static_cast<int>(new_time * getSampleRate()));
+                
+                juce::MidiMessage new_msg = (reversed) ? juce::MidiMessage::noteOff(1, note, velocity)
+                                                       : juce::MidiMessage::noteOn(1, note, velocity);
+                
+                double new_time = (reversed) ? reverse_time : norm_time;
+                
+                midiBuffer.addEvent(new_msg, static_cast<int>(new_time * getSampleRate()));
             }
             else if (msg.isNoteOff()) {
-                midiBuffer.addEvent(juce::MidiMessage::noteOff(1, note, velocity), static_cast<int>(new_time * getSampleRate()));
+                juce::MidiMessage new_msg = (reversed) ? juce::MidiMessage::noteOn(1, note, velocity)
+                                                       : juce::MidiMessage::noteOff(1, note, velocity);
+                
+                double new_time = (reversed) ? reverse_time : norm_time;
+                
+                midiBuffer.addEvent(new_msg, static_cast<int>(new_time * getSampleRate()));
             }
         }
     }
